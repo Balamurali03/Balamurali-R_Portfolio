@@ -260,7 +260,43 @@
     @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
     /* ── RESPONSIVE ── */
-    @media (max-width:960px) { .about-grid { grid-template-columns:1fr; gap:36px; } .hero-reactor-wrap { display:none; } }
+    /* ── HERO MOBILE REACTOR ── */
+    .hero-reactor-mobile {
+      display:none;
+      justify-content:center;
+      align-items:center;
+      width:100%;
+      padding:28px 0 4px;
+      position:relative;
+      z-index:2;
+      opacity:0;
+      animation:fadeIn 1s 2.8s forwards;
+    }
+    .hero-reactor-mobile-inner {
+      position:relative;
+      width:150px; height:150px;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .hero-reactor-mobile-inner svg {
+      width:78%; height:78%;
+      animation:reactorPulse 3s ease-in-out infinite;
+      filter:drop-shadow(0 0 22px var(--cyan)) drop-shadow(0 0 44px rgba(0,212,255,0.4));
+      position:relative; z-index:2;
+    }
+    .hrm-ring { position:absolute; inset:0; border-radius:50%; border:1px solid rgba(0,212,255,0.22); animation:spinRing 10s linear infinite; }
+    .hrm-ring:nth-child(2) { inset:-12px; border-color:rgba(0,212,255,0.12); animation-duration:18s; animation-direction:reverse; }
+    .hrm-ring:nth-child(3) { inset:-26px; border:1px dashed rgba(0,212,255,0.08); animation-duration:28s; }
+    .hrm-ring::before { content:''; position:absolute; width:6px; height:6px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px var(--cyan); top:-3px; left:50%; transform:translateX(-50%); }
+
+    @media (max-width:960px) {
+      .about-grid { grid-template-columns:1fr; gap:36px; }
+      .hero-reactor-wrap { display:none; }
+      .hero-reactor-mobile { display:flex; }
+      #hero { flex-direction:column; align-items:stretch; height:auto; min-height:100vh; }
+      .hero-content { text-align:center; padding-bottom:clamp(70px,10vh,100px); }
+      .hero-desc { max-width:100%; margin-left:auto; margin-right:auto; }
+      .hero-actions { justify-content:center; }
+    }
     @media (max-width:700px) {
       .nav-links { display:none; } .nav-cta { display:none; } .nav-hamburger { display:flex; }
       .exp-item { grid-template-columns:1fr; gap:8px; } .exp-item::before { display:none; } .exp-content { padding-left:0; }
@@ -690,6 +726,16 @@
       <div class="reactor-bar-wrap"><div class="reactor-bar-fill"></div></div>
     </div>
   </div>
+  <!-- MOBILE REACTOR — shown only ≤960px -->
+  <div class="hero-reactor-mobile">
+    <div class="hero-reactor-mobile-inner">
+      <div class="hrm-ring"></div>
+      <div class="hrm-ring"></div>
+      <div class="hrm-ring"></div>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><defs><radialGradient id='coreGlowM' cx='50%' cy='50%' r='50%'><stop offset='0%' stop-color='#aff7ff' stop-opacity='1'/><stop offset='35%' stop-color='#00d4ff' stop-opacity='0.9'/><stop offset='100%' stop-color='#004455' stop-opacity='0.2'/></radialGradient><radialGradient id='pgrdM' cx='50%' cy='50%' r='50%'><stop offset='0%' stop-color='#0a3a4a'/><stop offset='100%' stop-color='#020c14'/></radialGradient><filter id='glowM'><feGaussianBlur stdDeviation='3.5' result='b'/><feComposite in='SourceGraphic' in2='b' operator='over'/></filter><filter id='iglowM'><feGaussianBlur stdDeviation='6' result='b'/><feComposite in='SourceGraphic' in2='b' operator='over'/></filter></defs><polygon points='100,5 177,50 177,150 100,195 23,150 23,50' fill='#010810' stroke='#081820' stroke-width='1'/><polygon points='100,11 171,52 171,148 100,189 29,148 29,52' fill='url(#pgrdM)' stroke='#0b4a60' stroke-width='1.5'/><polygon points='100,11 171,52 157,63 100,31 43,63 29,52' fill='#0a2535' stroke='#1ae0ff' stroke-width='0.7' opacity='0.9'/><polygon points='171,52 171,95 156,90 157,63' fill='#061e2c' stroke='#0da8cc' stroke-width='0.7' opacity='0.8'/><polygon points='171,95 171,148 157,137 156,90' fill='#061e2c' stroke='#0da8cc' stroke-width='0.7' opacity='0.7'/><polygon points='100,189 29,148 43,137 100,169 157,137 171,148' fill='#0a2535' stroke='#1ae0ff' stroke-width='0.7' opacity='0.8'/><polygon points='29,148 29,95 44,90 43,137' fill='#061e2c' stroke='#0da8cc' stroke-width='0.7' opacity='0.7'/><polygon points='29,52 29,95 44,90 43,63' fill='#061e2c' stroke='#0da8cc' stroke-width='0.7' opacity='0.8'/><circle cx='100' cy='13' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='171' cy='52' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='171' cy='148' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='100' cy='187' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='29' cy='148' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='29' cy='52' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><polygon points='100,30 157,63 157,137 100,170 43,137 43,63' fill='#050e18' stroke='#0b607a' stroke-width='1.2'/><circle cx='100' cy='100' r='58' fill='none' stroke='#0c5f7a' stroke-width='4'/><circle cx='100' cy='100' r='58' fill='none' stroke='#1ae0ff' stroke-width='0.8' opacity='0.5'/><g stroke='#1ae0ff' stroke-width='2' opacity='0.75'><line x1='100' y1='42' x2='100' y2='51'/><line x1='129' y1='50' x2='124.5' y2='58'/><line x1='150' y1='71' x2='143.5' y2='74.8'/><line x1='158' y1='100' x2='149' y2='100'/><line x1='150' y1='129' x2='143.5' y2='125.2'/><line x1='129' y1='150' x2='124.5' y2='142'/><line x1='100' y1='158' x2='100' y2='149'/><line x1='71' y1='150' x2='75.5' y2='142'/><line x1='50' y1='129' x2='56.5' y2='125.2'/><line x1='42' y1='100' x2='51' y2='100'/><line x1='50' y1='71' x2='56.5' y2='74.8'/><line x1='71' y1='50' x2='75.5' y2='58'/></g><circle cx='100' cy='100' r='48' fill='none' stroke='#094f63' stroke-width='5.5'/><circle cx='100' cy='100' r='48' fill='none' stroke='#1ae0ff' stroke-width='1.8' stroke-dasharray='24 6' opacity='0.9'/><circle cx='100' cy='100' r='38' fill='none' stroke='#07303f' stroke-width='6.5'/><circle cx='100' cy='100' r='38' fill='none' stroke='#00d4ff' stroke-width='1.5' opacity='0.7'/><g fill='#0a2e3e' stroke='#1ae0ff' stroke-width='0.9'><rect x='96.5' y='62' width='7' height='13' rx='1'/><rect x='96.5' y='125' width='7' height='13' rx='1'/><rect x='116' y='71' width='7' height='13' rx='1' transform='rotate(60 119.5 77.5)'/><rect x='116' y='116' width='7' height='13' rx='1' transform='rotate(120 119.5 122.5)'/><rect x='77' y='116' width='7' height='13' rx='1' transform='rotate(240 80.5 122.5)'/><rect x='77' y='71' width='7' height='13' rx='1' transform='rotate(300 80.5 77.5)'/></g><polygon points='100,67 128,115 72,115' fill='#030e18' stroke='#00c8ef' stroke-width='2.5'/><line x1='100' y1='67' x2='128' y2='115' stroke='#1ae0ff' stroke-width='3.5' stroke-linecap='round'/><line x1='128' y1='115' x2='72' y2='115' stroke='#1ae0ff' stroke-width='3.5' stroke-linecap='round'/><line x1='72' y1='115' x2='100' y2='67' stroke='#1ae0ff' stroke-width='3.5' stroke-linecap='round'/><polygon points='100,73 123,112 77,112' fill='none' stroke='#008aaa' stroke-width='1'/><polygon points='100,77 119,110 81,110' fill='#001522' opacity='0.9'/><polygon points='100,77 119,110 81,110' fill='url(#coreGlowM)' opacity='0.9' filter='url(#iglowM)'/><circle cx='100' cy='97' r='10' fill='#00deff' opacity='0.85' filter='url(#glowM)'/><circle cx='100' cy='97' r='6' fill='#88ffff' opacity='1'/><circle cx='100' cy='97' r='3' fill='white'/></svg>
+    </div>
+  </div>
+
   <div class="hero-content">
     <div class="hero-label">PORTFOLIO v2026 // BACKEND ENGINEER</div>
     <h1 class="hero-title">I am<span class="name-hl">Balamurali. R</span></h1>
@@ -1412,13 +1458,15 @@ function addMsg(text, type, animate=true) {
 }
 
 function handleCommand(input) {
-  // ── STOP command ──
+  // ── STOP command: kill all speech immediately, no TTS at all ──
   const stopTriggers = ['stop','halt','quiet','silence','shut up','pause','cancel','enough','mute'];
   if (stopTriggers.some(t => input.toLowerCase().includes(t))) {
     stopSpeaking();
     stopVoice();
     jpStatusTxt.textContent = 'STANDBY';
     jarvisBtn.classList.remove('listening');
+    animateWave(false);
+    jarvisPanel.classList.remove('speaking');
     const stopResponses = [
       "Standing by, sir.",
       "Understood. Going silent.",
@@ -1428,14 +1476,8 @@ function handleCommand(input) {
     const resp = stopResponses[Math.floor(Math.random() * stopResponses.length)];
     if (!panelOpen) openJarvis();
     addMsg(input, 'user', false);
-    addMsg(resp, 'jarvis');
-    // Brief spoken acknowledgment before going silent
-    const ack = new SpeechSynthesisUtterance("Standing by.");
-    ack.rate = 0.88; ack.pitch = 0.82; ack.volume = 1.0;
-    const v = getSelectedVoice() || getBestVoice();
-    if (v) ack.voice = v;
-    if (window.speechSynthesis) window.speechSynthesis.speak(ack);
-    return;
+    addMsg(resp, 'jarvis'); // text only — NO speakText() call
+    return; // ← exit here, never reaches speakText below
   }
 
   if (!panelOpen) openJarvis();
@@ -1600,6 +1642,13 @@ async function speakText(text) {
 
   // Try ElevenLabs first
   const audioUrl = await speakElevenLabs(text);
+
+  // If stop was called while we were fetching, bail out immediately
+  if (!speaking) {
+    if (audioUrl) URL.revokeObjectURL(audioUrl);
+    return;
+  }
+
   if (audioUrl) {
     currentAudio = new Audio(audioUrl);
     currentAudio.onended = () => {
@@ -1659,7 +1708,12 @@ function speakWebSpeech(text) {
 }
 
 function stopSpeaking() {
-  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  if (currentAudio) {
+    currentAudio.onended = null;
+    currentAudio.onerror = null;
+    currentAudio.pause();
+    currentAudio = null;
+  }
   if (synth) synth.cancel();
   speaking = false;
   animateWave(false);
