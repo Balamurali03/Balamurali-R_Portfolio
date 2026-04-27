@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BALAMURALI R | Java Backend Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cyan:      #00d4ff;
+      --cyan-dim:  #007a99;
+      --cyan-glow: rgba(0,212,255,0.3);
+      --gold:      #e8b84b;
+      --gold-dim:  #a07a1e;
+      --white:     #f0f0f0;
+      --dim:       #777;
+      --bg:        #000;
+      --hb:        rgba(0,212,255,0.18);
+      --hb2:       rgba(0,212,255,0.55);
+      --mono:      'Share Tech Mono', monospace;
+      --disp:      'Orbitron', sans-serif;
+      --body:      'Rajdhani', sans-serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      background:var(--bg);
+      color:var(--white);
+      font-family:var(--body);
+      overflow-x:hidden;
+      cursor:crosshair;
+    }
+    body::after {
+      content:'';
+      position:fixed; inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events:none; z-index:9998; opacity:0.5;
+    }
+    ::-webkit-scrollbar { width:3px; }
+    ::-webkit-scrollbar-track { background:#050505; }
+    ::-webkit-scrollbar-thumb { background:var(--cyan-dim); }
+
+    /* ── INTRO SCREEN ── */
+    #intro {
+      position:fixed; inset:0; z-index:9997;
+      background:#000;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:32px;
+      transition:opacity 0.8s ease, visibility 0.8s;
+    }
+    #intro.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+    .intro-reactor { position:relative; width:220px; height:220px; display:flex; align-items:center; justify-content:center; }
+    .intro-reactor svg { width:180px; height:180px; animation:reactorPulse 2s ease-in-out infinite; filter:drop-shadow(0 0 30px var(--cyan)) drop-shadow(0 0 60px var(--cyan-dim)); position:relative; z-index:2; }
+    .intro-ring { position:absolute; inset:0; border-radius:50%; border:1px solid var(--hb2); animation:spinRing 8s linear infinite; }
+    .intro-ring:nth-child(2) { inset:-15px; border-color:rgba(0,212,255,0.2); animation-duration:14s; animation-direction:reverse; }
+    .intro-ring:nth-child(3) { inset:-35px; border:1px dashed rgba(0,212,255,0.12); animation-duration:22s; }
+    .intro-ring::before, .intro-ring::after { content:''; position:absolute; width:8px; height:8px; border-radius:50%; background:var(--cyan); box-shadow:0 0 12px var(--cyan); }
+    .intro-ring::before { top:-4px; left:50%; transform:translateX(-50%); }
+    .intro-ring::after  { bottom:-4px; left:50%; transform:translateX(-50%); }
+    .intro-bar { width:280px; position:relative; }
+    .intro-bar-track { height:2px; background:rgba(0,212,255,0.12); position:relative; overflow:hidden; }
+    .intro-bar-fill { height:100%; background:var(--cyan); box-shadow:0 0 10px var(--cyan); animation:barFill 2.4s cubic-bezier(0.4,0,0.2,1) forwards; width:0; }
+    .intro-bar-label { font-family:var(--mono); font-size:9px; color:rgba(0,212,255,0.5); letter-spacing:3px; text-transform:uppercase; margin-bottom:6px; display:flex; justify-content:space-between; }
+    #intro-pct { color:var(--cyan); }
+    .intro-title { font-family:var(--disp); font-size:clamp(13px,3vw,20px); font-weight:900; letter-spacing:8px; color:var(--white); text-transform:uppercase; opacity:0; animation:fadeIn 0.5s 0.4s forwards; }
+    .intro-title span { color:var(--cyan); }
+    @keyframes reactorPulse {
+      0%,100% { filter:drop-shadow(0 0 20px var(--cyan)) drop-shadow(0 0 40px var(--cyan-dim)); transform:scale(1); }
+      50%      { filter:drop-shadow(0 0 50px var(--cyan)) drop-shadow(0 0 100px rgba(0,212,255,0.5)); transform:scale(1.04); }
+    }
+    @keyframes spinRing { to { transform:rotate(360deg); } }
+    @keyframes barFill { to { width:100%; } }
+
+    /* ── NAV ── */
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:1000;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px clamp(16px,4vw,40px);
+      background:linear-gradient(to bottom,rgba(0,0,0,0.95),transparent);
+      border-bottom:1px solid var(--hb);
+      backdrop-filter:blur(4px);
+    }
+    .nav-brand { font-family:var(--disp); font-size:clamp(9px,1.5vw,12px); font-weight:900; letter-spacing:3px; color:var(--cyan); text-transform:uppercase; display:flex; align-items:center; gap:8px; }
+    .nav-brand-reactor { width:22px; height:22px; animation:reactorPulse 3s infinite; filter:drop-shadow(0 0 6px var(--cyan)); }
+    .nav-brand span { color:rgba(255,255,255,0.35); font-size:10px; }
+    .nav-links { display:flex; gap:clamp(16px,3vw,32px); list-style:none; }
+    .nav-links a { font-family:var(--mono); font-size:9px; color:var(--dim); text-decoration:none; letter-spacing:2px; text-transform:uppercase; transition:color 0.2s; }
+    .nav-links a:hover { color:var(--cyan); }
+    .nav-hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; }
+    .nav-hamburger span { display:block; width:22px; height:2px; background:var(--cyan); transition:all 0.3s; }
+    .nav-cta { font-family:var(--mono); font-size:9px; letter-spacing:2px; color:var(--cyan); border:1px solid var(--cyan-dim); padding:7px 16px; text-decoration:none; text-transform:uppercase; transition:all 0.2s; clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%); }
+    .nav-cta:hover { background:var(--cyan); color:#000; }
+    .nav-drawer { display:none; position:fixed; top:49px; left:0; right:0; background:rgba(0,0,0,0.97); z-index:999; border-bottom:1px solid var(--hb); padding:20px clamp(16px,4vw,40px); flex-direction:column; gap:16px; }
+    .nav-drawer.open { display:flex; }
+    .nav-drawer a { font-family:var(--mono); font-size:11px; color:var(--dim); text-decoration:none; letter-spacing:3px; text-transform:uppercase; padding:10px 0; border-bottom:1px solid var(--hb); transition:color 0.2s; }
+    .nav-drawer a:hover { color:var(--cyan); }
+
+    /* ── TICKER ── */
+    .ticker { position:fixed; top:49px; left:0; right:0; z-index:998; overflow:hidden; border-top:1px solid var(--hb); border-bottom:1px solid var(--hb); padding:6px 0; background:rgba(0,0,0,0.8); }
+    .ticker-inner { display:flex; gap:48px; white-space:nowrap; animation:ticker 28s linear infinite; }
+    .ticker-item { font-family:var(--mono); font-size:8px; letter-spacing:2px; color:rgba(0,212,255,0.35); text-transform:uppercase; }
+    .ticker-item::before { content:'◆ '; color:rgba(0,212,255,0.2); }
+    @keyframes ticker { 0% { transform:translateX(0); } 100% { transform:translateX(-50%); } }
+
+    /* ── HERO ── */
+    #hero { position:relative; width:100%; height:100vh; display:flex; align-items:flex-end; overflow:hidden; padding-top:80px; }
+    .hero-bg {
+      position:absolute; inset:0;
+      background:
+        radial-gradient(ellipse at 65% 45%, rgba(0,180,220,0.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 15% 65%, rgba(0,100,140,0.05) 0%, transparent 50%),
+        linear-gradient(160deg,#050508 0%,#000 100%);
+    }
+    .hero-bg::before {
+      content:''; position:absolute; inset:0;
+      background-image: linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px), linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
+      background-size:56px 56px; animation:gridMove 18s linear infinite;
+    }
+    @keyframes gridMove { 0% { transform:translate(0,0); } 100% { transform:translate(56px,56px); } }
+    .corner { position:absolute; width:24px; height:24px; }
+    .corner-tl { top:82px; left:16px; border-top:2px solid var(--cyan); border-left:2px solid var(--cyan); }
+    .corner-tr { top:82px; right:16px; border-top:2px solid var(--cyan); border-right:2px solid var(--cyan); }
+    .corner-bl { bottom:44px; left:16px; border-bottom:2px solid var(--cyan); border-left:2px solid var(--cyan); }
+    .corner-br { bottom:44px; right:16px; border-bottom:2px solid var(--cyan); border-right:2px solid var(--cyan); }
+    .scan-line { position:absolute; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent 0%,rgba(0,212,255,0.35) 50%,transparent 100%); animation:scan 10s linear infinite; pointer-events:none; }
+    @keyframes scan { 0% { top:82px; opacity:1; } 100% { top:calc(100% - 44px); opacity:0.2; } }
+    .hud-tiny { font-family:var(--mono); font-size:7px; color:rgba(0,212,255,0.4); letter-spacing:2px; text-transform:uppercase; line-height:1.9; }
+    .hud-top-left { position:absolute; top:88px; left:24px; z-index:2; }
+    .hud-top-right { position:absolute; top:88px; right:24px; z-index:2; text-align:right; }
+    .hero-reactor-wrap { position:absolute; right:clamp(4%,8vw,10%); top:50%; transform:translateY(-48%); z-index:2; opacity:0; animation:fadeIn 1.2s 2.8s forwards; }
+    .hero-reactor-img-wrap { position:relative; width:clamp(200px,22vw,320px); height:clamp(200px,22vw,320px); display:flex; align-items:center; justify-content:center; }
+    .hero-reactor-img-wrap svg { width:85%; height:85%; object-fit:contain; position:relative; z-index:2; animation:reactorPulse 3s ease-in-out infinite; filter:drop-shadow(0 0 30px var(--cyan)) drop-shadow(0 0 60px rgba(0,212,255,0.4)); }
+    .hr-ring { position:absolute; inset:0; border-radius:50%; border:1px solid rgba(0,212,255,0.18); animation:spinRing 12s linear infinite; }
+    .hr-ring:nth-child(2) { inset:-16px; border-color:rgba(0,212,255,0.1); animation-duration:20s; animation-direction:reverse; }
+    .hr-ring:nth-child(3) { inset:-36px; border:1px dashed rgba(0,212,255,0.07); animation-duration:32s; }
+    .hr-ring::before { content:''; position:absolute; width:7px;height:7px; border-radius:50%; background:var(--cyan); box-shadow:0 0 10px var(--cyan); top:-3.5px; left:50%; transform:translateX(-50%); }
+    .reactor-readout { text-align:center; margin-top:12px; }
+    .reactor-readout-label { font-family:var(--mono); font-size:8px; color:rgba(0,212,255,0.5); letter-spacing:3px; text-transform:uppercase; margin-bottom:4px; }
+    .reactor-bar-wrap { width:100%; height:3px; background:rgba(0,212,255,0.1); }
+    .reactor-bar-fill { height:100%; background:var(--cyan); box-shadow:0 0 8px var(--cyan); animation:reactorBar 3s ease-in-out infinite; }
+    @keyframes reactorBar { 0%,100% { width:96%; } 50% { width:100%; } }
+    .hero-content { position:relative; z-index:3; padding:0 clamp(16px,5vw,52px) clamp(56px,8vh,80px); max-width:680px; }
+    .hero-label { font-family:var(--mono); font-size:9px; color:var(--cyan); letter-spacing:3px; text-transform:uppercase; margin-bottom:14px; opacity:0; animation:fadeUp 0.6s 2.6s forwards; }
+    .hero-label::before { content:'// '; opacity:0.4; }
+    .hero-title { font-family:var(--disp); font-size:clamp(32px,6.5vw,76px); font-weight:900; line-height:1.05; letter-spacing:-1px; margin-bottom:10px; opacity:0; animation:fadeUp 0.6s 2.8s forwards; }
+    .hero-title .name-hl { color:var(--cyan); display:block; }
+    .hero-subtitle { font-family:var(--mono); font-size:11px; color:var(--dim); letter-spacing:2px; text-transform:uppercase; margin-bottom:22px; opacity:0; animation:fadeUp 0.6s 3.0s forwards; }
+    .hero-desc { font-size:clamp(13px,1.5vw,16px); color:rgba(240,240,240,0.58); line-height:1.75; max-width:440px; margin-bottom:30px; opacity:0; animation:fadeUp 0.6s 3.2s forwards; }
+    .hero-actions { display:flex; gap:14px; flex-wrap:wrap; opacity:0; animation:fadeUp 0.6s 3.4s forwards; }
+    .btn-primary { font-family:var(--mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; padding:13px 26px; background:var(--cyan); color:#000; text-decoration:none; font-weight:700; clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%); transition:transform 0.2s, box-shadow 0.2s; }
+    .btn-primary:hover { transform:scale(1.04); box-shadow:0 0 20px var(--cyan-glow); }
+    .btn-secondary { font-family:var(--mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; padding:13px 26px; background:transparent; color:var(--cyan); text-decoration:none; border:1px solid var(--hb2); clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%); transition:all 0.2s; }
+    .btn-secondary:hover { background:rgba(0,212,255,0.08); }
+    .hud-bottom { position:absolute; bottom:14px; left:24px; right:24px; display:flex; justify-content:space-between; align-items:center; z-index:3; }
+    .hud-data { font-family:var(--mono); font-size:8px; color:rgba(0,212,255,0.4); letter-spacing:2px; }
+    .hud-status { display:flex; gap:6px; align-items:center; }
+    .status-dot { width:6px; height:6px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px var(--cyan); animation:blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.25;} }
+
+    /* ── GENERAL SECTION STYLES ── */
+    section { padding:clamp(70px,10vh,110px) 0; position:relative; overflow:hidden; }
+    .inner { max-width:1100px; margin:0 auto; padding:0 clamp(16px,5vw,52px); }
+    .section-hud-label { font-family:var(--mono); font-size:9px; color:var(--cyan-dim); letter-spacing:4px; text-transform:uppercase; margin-bottom:10px; }
+    .section-title { font-family:var(--disp); font-size:clamp(22px,4vw,44px); font-weight:900; margin-bottom:44px; line-height:1.15; }
+    .accent { color:var(--cyan); }
+    .section-divider { height:1px; background:linear-gradient(90deg,transparent,var(--hb2),transparent); margin:0 clamp(16px,5vw,52px); }
+
+    /* ── ABOUT ── */
+    .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:52px; align-items:start; }
+    .about-text p { font-size:clamp(13px,1.4vw,16px); color:rgba(240,240,240,0.65); line-height:1.8; margin-bottom:18px; }
+    .about-reactor-widget { margin-top:32px; border:1px solid var(--hb); padding:22px; background:rgba(0,0,0,0.4); clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%); }
+    .arw-header { font-family:var(--mono); font-size:9px; color:var(--cyan); letter-spacing:3px; text-transform:uppercase; margin-bottom:18px; }
+    .arw-row { display:grid; grid-template-columns:120px 1fr 40px; gap:12px; align-items:center; margin-bottom:10px; }
+    .arw-label { font-family:var(--mono); font-size:9px; color:rgba(240,240,240,0.6); letter-spacing:1px; }
+    .arw-bar { height:3px; background:rgba(0,212,255,0.1); position:relative; overflow:hidden; }
+    .arw-fill { height:100%; background:linear-gradient(90deg,var(--cyan-dim),var(--cyan)); box-shadow:0 0 8px var(--cyan); transition:width 1.4s cubic-bezier(0.4,0,0.2,1); }
+    .arw-pct { font-family:var(--mono); font-size:9px; color:var(--cyan); text-align:right; }
+    .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .stat-card { border:1px solid var(--hb); padding:22px 16px; text-align:center; background:rgba(0,0,0,0.5); clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%); transition:all 0.3s; }
+    .stat-card:hover { border-color:var(--hb2); background:rgba(0,212,255,0.04); }
+    .stat-number { font-family:var(--disp); font-size:clamp(20px,2.5vw,28px); font-weight:900; color:var(--cyan); margin-bottom:6px; }
+    .stat-label { font-family:var(--mono); font-size:8px; color:var(--dim); letter-spacing:2px; text-transform:uppercase; }
+
+    /* ── EXPERIENCE ── */
+    #experience { background:linear-gradient(180deg,#000 0%,#020406 100%); }
+    .exp-item { display:grid; grid-template-columns:200px 1fr; gap:32px; margin-bottom:56px; position:relative; }
+    .exp-item::before { content:''; position:absolute; left:200px; top:0; bottom:0; width:1px; background:linear-gradient(180deg,var(--hb2),transparent); }
+    .exp-meta { padding-top:4px; }
+    .exp-company { font-family:var(--disp); font-size:clamp(11px,1.3vw,14px); font-weight:700; color:var(--cyan); margin-bottom:8px; }
+    .exp-date { font-family:var(--mono); font-size:8px; color:var(--dim); letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+    .exp-content { padding-left:32px; }
+    .exp-role { font-family:var(--disp); font-size:clamp(14px,1.8vw,18px); font-weight:700; color:var(--white); margin-bottom:14px; }
+    .exp-project { font-family:var(--mono); font-size:9px; color:var(--cyan); letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; opacity:0.85; }
+    .exp-bullets { list-style:none; margin-bottom:14px; }
+    .exp-bullets li { font-size:clamp(12px,1.3vw,14px); color:rgba(240,240,240,0.62); padding:5px 0 5px 18px; position:relative; border-bottom:1px solid rgba(0,212,255,0.04); line-height:1.6; }
+    .exp-bullets li::before { content:'›'; position:absolute; left:0; color:var(--cyan); font-size:14px; }
+    .hi { color:var(--cyan); font-weight:600; }
+    .tech-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+    .tech-tag { font-family:var(--mono); font-size:8px; letter-spacing:1px; padding:3px 8px; border:1px solid rgba(0,212,255,0.2); color:rgba(0,212,255,0.6); text-transform:uppercase; }
+
+    /* ── PROJECTS ── */
+    #projects { background:linear-gradient(180deg,#000 0%,#020608 100%); }
+    .projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr)); gap:22px; }
+    .project-card { border:1px solid var(--hb); background:rgba(0,0,0,0.6); padding:clamp(20px,3vw,32px); position:relative; clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px)); transition:all 0.3s; overflow:hidden; }
+    .project-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--cyan),transparent); transform:scaleX(0); transition:transform 0.4s; }
+    .project-card:hover { border-color:var(--hb2); background:rgba(0,212,255,0.025); transform:translateY(-3px); }
+    .project-card:hover::before { transform:scaleX(1); }
+    .project-badge { font-family:var(--mono); font-size:8px; letter-spacing:2px; color:#000; background:var(--cyan); padding:3px 10px; text-transform:uppercase; display:inline-block; margin-bottom:14px; }
+    .project-name { font-family:var(--disp); font-size:clamp(18px,2vw,22px); font-weight:700; margin-bottom:6px; color:var(--white); }
+    .project-tagline { font-family:var(--mono); font-size:9px; color:var(--cyan); letter-spacing:2px; margin-bottom:14px; opacity:0.8; }
+    .project-desc { font-size:clamp(12px,1.3vw,14px); color:rgba(240,240,240,0.58); line-height:1.75; margin-bottom:18px; }
+    .project-features { list-style:none; margin-bottom:18px; }
+    .project-features li { font-size:clamp(11px,1.2vw,13px); color:rgba(240,240,240,0.52); padding:4px 0 4px 16px; position:relative; border-bottom:1px solid rgba(0,212,255,0.05); }
+    .project-features li::before { content:'✦'; position:absolute; left:0; color:var(--cyan); font-size:7px; top:8px; }
+    .project-links { display:flex; gap:10px; flex-wrap:wrap; }
+    .project-link { font-family:var(--mono); font-size:9px; letter-spacing:2px; text-transform:uppercase; padding:8px 16px; text-decoration:none; transition:all 0.2s; }
+    .project-link.primary { background:var(--cyan); color:#000; font-weight:700; }
+    .project-link.secondary { border:1px solid var(--hb2); color:var(--cyan); }
+    .project-link:hover { opacity:0.8; }
+
+    /* ── SKILLS ── */
+    #skills { background:linear-gradient(180deg,#020608 0%,#000 100%); }
+    .skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:20px; }
+    .skill-category { border:1px solid var(--hb); padding:22px; background:rgba(0,0,0,0.5); clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%); transition:border-color 0.3s; }
+    .skill-category:hover { border-color:var(--hb2); }
+    .skill-category-title { font-family:var(--mono); font-size:9px; color:var(--cyan); letter-spacing:3px; text-transform:uppercase; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--hb); }
+    .skill-items { display:flex; flex-wrap:wrap; gap:7px; }
+    .skill-item { font-family:var(--mono); font-size:9px; padding:5px 10px; background:rgba(0,212,255,0.04); border:1px solid rgba(0,212,255,0.18); color:rgba(240,240,240,0.75); letter-spacing:1px; transition:all 0.2s; cursor:default; }
+    .skill-item:hover { background:rgba(0,212,255,0.14); border-color:var(--cyan); color:var(--cyan); }
+
+    /* ── ACHIEVEMENTS ── */
+    #achievements { background:linear-gradient(180deg,#000 0%,#020608 100%); }
+    .achievements-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr)); gap:14px; }
+    .achievement-item { display:flex; gap:14px; padding:18px; border:1px solid var(--hb); background:rgba(0,0,0,0.4); transition:all 0.3s; clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%); }
+    .achievement-item:hover { border-color:var(--hb2); background:rgba(0,212,255,0.04); }
+    .achievement-icon { font-size:20px; flex-shrink:0; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border:1px solid var(--hb); color:var(--cyan); }
+    .achievement-text { font-size:13px; color:rgba(240,240,240,0.68); line-height:1.55; }
+    .achievement-text strong { color:var(--cyan); display:block; font-size:14px; margin-bottom:4px; font-family:var(--disp); }
+
+    /* ── CONTACT ── */
+    #contact { background:#000; text-align:center; padding:clamp(70px,10vh,110px) clamp(16px,5vw,52px) 56px; position:relative; overflow:hidden; }
+    #contact::before { content:'CONTACT'; position:absolute; font-family:var(--disp); font-size:clamp(80px,15vw,200px); font-weight:900; color:rgba(0,212,255,0.025); top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; white-space:nowrap; }
+    .contact-title { font-family:var(--disp); font-size:clamp(28px,6vw,64px); font-weight:900; margin-bottom:10px; }
+    .contact-subtitle { font-family:var(--mono); font-size:10px; color:var(--dim); letter-spacing:3px; text-transform:uppercase; margin-bottom:44px; }
+    .contact-links { display:flex; justify-content:center; gap:14px; flex-wrap:wrap; margin-bottom:56px; }
+    .contact-link { font-family:var(--mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; padding:13px 22px; text-decoration:none; color:var(--cyan); border:1px solid var(--hb2); display:flex; align-items:center; gap:8px; transition:all 0.2s; clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%); }
+    .contact-link:hover { background:var(--cyan); color:#000; }
+    .footer-bar { border-top:1px solid var(--hb); padding-top:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; max-width:900px; margin:0 auto; }
+    .footer-brand { font-family:var(--disp); font-size:10px; font-weight:700; color:var(--cyan); letter-spacing:3px; }
+    .footer-copy { font-family:var(--mono); font-size:8px; color:var(--dim); letter-spacing:2px; }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.7s, transform 0.7s; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    /* ── KEYFRAMES ── */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:960px) { .about-grid { grid-template-columns:1fr; gap:36px; } .hero-reactor-wrap { display:none; } }
+    @media (max-width:700px) {
+      .nav-links { display:none; } .nav-cta { display:none; } .nav-hamburger { display:flex; }
+      .exp-item { grid-template-columns:1fr; gap:8px; } .exp-item::before { display:none; } .exp-content { padding-left:0; }
+      .hud-top-left,.hud-top-right { display:none; } .hud-bottom { flex-direction:column; gap:4px; align-items:flex-start; }
+      .footer-bar { flex-direction:column; text-align:center; gap:6px; }
+    }
+    @media (max-width:480px) { .stats-grid { grid-template-columns:1fr 1fr; } .contact-links { flex-direction:column; align-items:center; } }
+
+    /* ═══════════════════════════════════════════
+       ENHANCED ANIMATIONS & GRAPHICS
+    ═══════════════════════════════════════════ */
+
+    /* Floating particles canvas */
+    #particles-canvas {
+      position:fixed; inset:0;
+      pointer-events:none; z-index:0;
+      opacity:0.6;
+    }
+
+    /* Section animated backgrounds */
+    #about { background:linear-gradient(180deg,#000 0%,#030508 100%); }
+
+    /* Animated circuit lines for about section */
+    .circuit-bg {
+      position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0;
+    }
+    .circuit-svg { width:100%; height:100%; opacity:0.04; }
+
+    /* Data stream lines */
+    .data-stream {
+      position:absolute; width:1px; background:linear-gradient(180deg, transparent, var(--cyan), transparent);
+      animation:dataStream 4s linear infinite;
+      opacity:0;
+    }
+    @keyframes dataStream {
+      0% { top:-100%; opacity:0; }
+      10% { opacity:1; }
+      90% { opacity:1; }
+      100% { top:100%; opacity:0; }
+    }
+
+    /* Floating tech orbs */
+    .floating-orbs { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+    .orb {
+      position:absolute; border-radius:50%;
+      background:radial-gradient(circle, rgba(0,212,255,0.15) 0%, transparent 70%);
+      animation:orbFloat linear infinite;
+    }
+    @keyframes orbFloat {
+      0%   { transform:translateY(0) translateX(0) scale(1); opacity:0; }
+      10%  { opacity:1; }
+      50%  { transform:translateY(-40px) translateX(20px) scale(1.1); }
+      90%  { opacity:1; }
+      100% { transform:translateY(-80px) translateX(-10px) scale(0.9); opacity:0; }
+    }
+
+    /* Glowing grid for skills section */
+    .skills-grid-bg {
+      position:absolute; inset:0; pointer-events:none; z-index:0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,212,255,0.025) 1px,transparent 1px);
+      background-size:40px 40px;
+      animation:skillGridPulse 6s ease-in-out infinite;
+    }
+    @keyframes skillGridPulse { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
+
+    /* Animated stat cards counter */
+    .stat-number { transition:color 0.3s; }
+
+    /* Enhanced achievement items with pulse */
+    .achievement-item .achievement-icon {
+      position:relative; overflow:hidden;
+      transition:all 0.3s;
+    }
+    .achievement-item:hover .achievement-icon {
+      background:rgba(0,212,255,0.1);
+      border-color:var(--cyan);
+      box-shadow:0 0 20px rgba(0,212,255,0.3);
+      transform:scale(1.1);
+    }
+
+    /* Skill items staggered entrance */
+    .skill-item {
+      animation:skillAppear 0.4s both;
+      position:relative; overflow:hidden;
+    }
+    .skill-item::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(90deg, transparent, rgba(0,212,255,0.1), transparent);
+      transform:translateX(-100%);
+      transition:transform 0.4s;
+    }
+    .skill-item:hover::after { transform:translateX(100%); }
+    @keyframes skillAppear { from { opacity:0; transform:scale(0.85); } to { opacity:1; transform:scale(1); } }
+
+    /* Project card holographic effect */
+    .project-card::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg, transparent 40%, rgba(0,212,255,0.03) 50%, transparent 60%);
+      transform:translateX(-100%);
+      transition:transform 0.6s;
+    }
+    .project-card:hover::after { transform:translateX(100%); }
+
+    /* Enhanced stat card with animated border */
+    .stat-card {
+      position:relative; overflow:hidden;
+    }
+    .stat-card::after {
+      content:''; position:absolute;
+      width:200%; height:200%; top:-50%; left:-50%;
+      background:conic-gradient(transparent 0deg, rgba(0,212,255,0.15) 60deg, transparent 120deg);
+      animation:statSpin 4s linear infinite;
+      opacity:0; transition:opacity 0.3s;
+    }
+    .stat-card:hover::after { opacity:1; }
+    @keyframes statSpin { to { transform:rotate(360deg); } }
+
+    /* Hexagon network background for experience */
+    .hex-bg {
+      position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden;
+    }
+
+    /* Timeline dot pulse */
+    .exp-item::after {
+      content:''; position:absolute;
+      left:calc(200px - 5px); top:8px;
+      width:10px; height:10px; border-radius:50%;
+      background:var(--cyan); box-shadow:0 0 12px var(--cyan);
+      animation:timelinePulse 2s ease-in-out infinite;
+    }
+    @keyframes timelinePulse {
+      0%,100% { box-shadow:0 0 8px var(--cyan), 0 0 0 0 rgba(0,212,255,0.4); }
+      50% { box-shadow:0 0 16px var(--cyan), 0 0 0 8px rgba(0,212,255,0); }
+    }
+    @media (max-width:700px) { .exp-item::after { display:none; } }
+
+    /* Achievements counter animation */
+    .achievement-item {
+      transition:transform 0.3s, box-shadow 0.3s;
+    }
+    .achievement-item:hover {
+      transform:translateY(-4px);
+      box-shadow:0 8px 30px rgba(0,212,255,0.15);
+    }
+
+    /* Contact section animated bg */
+    #contact .contact-rings {
+      position:absolute; inset:0; pointer-events:none; overflow:hidden;
+    }
+    .c-ring {
+      position:absolute; border-radius:50%; border:1px solid rgba(0,212,255,0.06);
+      top:50%; left:50%; transform:translate(-50%,-50%);
+      animation:ringExpand 6s linear infinite;
+    }
+    @keyframes ringExpand {
+      0% { width:0; height:0; opacity:1; }
+      100% { width:800px; height:800px; opacity:0; }
+    }
+
+    /* Skill category hover glow */
+    .skill-category {
+      position:relative; overflow:hidden;
+      transition:all 0.3s;
+    }
+    .skill-category::before {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg, rgba(0,212,255,0.05) 0%, transparent 100%);
+      opacity:0; transition:opacity 0.3s;
+    }
+    .skill-category:hover::before { opacity:1; }
+    .skill-category:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,212,255,0.1); }
+
+    /* Animated data nodes for about section */
+    .data-nodes { position:absolute; inset:0; pointer-events:none; z-index:0; }
+    .node-dot {
+      position:absolute; width:4px; height:4px; border-radius:50%;
+      background:var(--cyan); box-shadow:0 0 6px var(--cyan);
+      animation:nodePulse 3s ease-in-out infinite;
+    }
+    @keyframes nodePulse { 0%,100% { transform:scale(1); opacity:0.4; } 50% { transform:scale(1.5); opacity:0.8; } }
+
+    /* Section entrance with stagger */
+    .reveal-stagger { opacity:0; transform:translateY(28px); transition:opacity 0.7s, transform 0.7s; }
+    .reveal-stagger.visible { opacity:1; transform:translateY(0); }
+
+    /* ═══════════════════════════════════════════
+       JARVIS VOICE ASSISTANT
+    ═══════════════════════════════════════════ */
+    #jarvis-btn {
+      position:fixed; bottom:28px; right:28px;
+      width:60px; height:60px; border-radius:50%;
+      background:rgba(0,0,0,0.85);
+      border:2px solid var(--cyan);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; z-index:2000;
+      box-shadow:0 0 20px rgba(0,212,255,0.3);
+      transition:all 0.3s;
+    }
+    #jarvis-btn:hover { box-shadow:0 0 40px rgba(0,212,255,0.6); transform:scale(1.05); }
+    #jarvis-btn.listening {
+      border-color:#ff3366;
+      box-shadow:0 0 30px rgba(255,51,102,0.5);
+      animation:jarvisListen 0.8s ease-in-out infinite alternate;
+    }
+    @keyframes jarvisListen {
+      from { transform:scale(1); box-shadow:0 0 20px rgba(255,51,102,0.4); }
+      to   { transform:scale(1.08); box-shadow:0 0 50px rgba(255,51,102,0.7); }
+    }
+    .jarvis-icon {
+      width:28px; height:28px;
+      position:relative;
+    }
+    .jarvis-icon-ring {
+      position:absolute; inset:0; border-radius:50%;
+      border:2px solid var(--cyan); animation:spinRing 3s linear infinite;
+    }
+    .jarvis-icon-core {
+      position:absolute; inset:6px; border-radius:50%;
+      background:radial-gradient(circle, rgba(0,212,255,0.8) 0%, rgba(0,212,255,0.2) 100%);
+      animation:corePulse 2s ease-in-out infinite;
+    }
+    @keyframes corePulse { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
+
+    /* Jarvis panel */
+    #jarvis-panel {
+      position:fixed; bottom:100px; right:28px;
+      width:340px; max-width:calc(100vw - 40px);
+      background:rgba(0,5,10,0.95);
+      border:1px solid var(--cyan);
+      clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%);
+      z-index:1999; overflow:hidden;
+      transform:translateY(20px) scale(0.95);
+      opacity:0; pointer-events:none;
+      transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+      box-shadow:0 0 40px rgba(0,212,255,0.15);
+    }
+    #jarvis-panel.open {
+      transform:translateY(0) scale(1);
+      opacity:1; pointer-events:all;
+    }
+    .jp-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 16px;
+      border-bottom:1px solid var(--hb);
+      background:rgba(0,212,255,0.05);
+    }
+    .jp-title { font-family:var(--mono); font-size:10px; color:var(--cyan); letter-spacing:3px; }
+    .jp-status {
+      display:flex; align-items:center; gap:6px;
+      font-family:var(--mono); font-size:8px; color:var(--dim); letter-spacing:1px;
+    }
+    .jp-close {
+      font-family:var(--mono); font-size:12px; color:var(--dim);
+      cursor:pointer; padding:0 4px; transition:color 0.2s;
+    }
+    .jp-close:hover { color:var(--cyan); }
+
+    /* Waveform */
+    .jp-wave {
+      height:50px; display:flex; align-items:center; justify-content:center;
+      gap:3px; padding:0 16px;
+      border-bottom:1px solid var(--hb);
+      background:rgba(0,0,0,0.3);
+    }
+    .wave-bar {
+      width:3px; border-radius:2px;
+      background:var(--cyan); opacity:0.3;
+      transition:height 0.1s, opacity 0.1s;
+    }
+    #jarvis-panel.listening .wave-bar { opacity:0.8; }
+
+    /* Transcript / log area */
+    .jp-log {
+      height:180px; overflow-y:auto; padding:12px 16px;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .jp-log::-webkit-scrollbar { width:2px; }
+    .jp-log::-webkit-scrollbar-thumb { background:var(--cyan-dim); }
+    .jp-msg {
+      font-family:var(--mono); font-size:11px; line-height:1.6;
+      padding:8px 12px;
+      position:relative;
+    }
+    .jp-msg.user {
+      color:rgba(240,240,240,0.7);
+      border-left:2px solid rgba(0,212,255,0.4);
+      background:rgba(0,212,255,0.04);
+    }
+    .jp-msg.user::before { content:'YOU › '; color:var(--cyan); opacity:0.6; }
+    .jp-msg.jarvis {
+      color:rgba(0,212,255,0.9);
+      border-left:2px solid var(--cyan);
+      background:rgba(0,212,255,0.06);
+    }
+    .jp-msg.jarvis::before { content:'JARVIS › '; color:var(--cyan); }
+
+    /* Suggestions */
+    .jp-suggestions {
+      padding:10px 16px;
+      border-top:1px solid var(--hb);
+      display:flex; flex-wrap:wrap; gap:6px;
+    }
+    .jp-chip {
+      font-family:var(--mono); font-size:8px; letter-spacing:1px;
+      padding:4px 10px; border:1px solid var(--hb);
+      color:rgba(0,212,255,0.6); cursor:pointer; transition:all 0.2s;
+      text-transform:uppercase;
+    }
+    .jp-chip:hover { border-color:var(--cyan); color:var(--cyan); background:rgba(0,212,255,0.08); }
+    .stop-chip:hover { border-color:#ff3366 !important; color:#ff3366 !important; background:rgba(255,51,102,0.08) !important; }
+
+    /* Mic button row */
+    .jp-controls {
+      padding:12px 16px; display:flex; align-items:center; gap:10px;
+      border-top:1px solid var(--hb);
+    }
+    .jp-mic-btn {
+      width:36px; height:36px; border-radius:50%;
+      background:rgba(0,212,255,0.1); border:1px solid var(--cyan);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; flex-shrink:0; transition:all 0.2s;
+      color:var(--cyan); font-size:14px;
+    }
+    .jp-mic-btn:hover { background:rgba(0,212,255,0.2); }
+    .jp-mic-btn.active { background:#ff3366; border-color:#ff3366; color:#fff; animation:jarvisListen 0.8s ease-in-out infinite alternate; }
+    .jp-hint { font-family:var(--mono); font-size:9px; color:var(--dim); letter-spacing:1px; }
+
+    /* Section highlight overlay */
+    .section-highlight {
+      outline:2px solid rgba(0,212,255,0.5);
+      outline-offset:4px;
+      transition:outline 0.5s;
+    }
+
+    /* Typing cursor */
+    .typing-cursor::after { content:'|'; animation:blink 0.7s infinite; }
+
+    /* Scan line pulse on voice */
+    #jarvis-panel.speaking .jp-wave .wave-bar {
+      animation:wavePulse 0.3s ease-in-out infinite alternate;
+    }
+    @keyframes wavePulse {
+      from { transform:scaleY(0.3); }
+      to   { transform:scaleY(1); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Particle canvas -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- ═══════════════════════════════════════════
+     INTRO SCREEN
+══════════════════════════════════════════ -->
+<div id="intro">
+  <div class="intro-reactor">
+    <div class="intro-ring"></div>
+    <div class="intro-ring"></div>
+    <div class="intro-ring"></div>
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><defs><radialGradient id='coreGlow' cx='50%' cy='50%' r='50%'><stop offset='0%' stop-color='#aff7ff' stop-opacity='1'/><stop offset='35%' stop-color='#00d4ff' stop-opacity='0.9'/><stop offset='100%' stop-color='#004455' stop-opacity='0.2'/></radialGradient><radialGradient id='pgrd' cx='50%' cy='50%' r='50%'><stop offset='0%' stop-color='#0a3a4a'/><stop offset='100%' stop-color='#020c14'/></radialGradient><filter id='glow'><feGaussianBlur stdDeviation='3.5' result='b'/><feComposite in='SourceGraphic' in2='b' operator='over'/></filter><filter id='iglow'><feGaussianBlur stdDeviation='6' result='b'/><feComposite in='SourceGraphic' in2='b' operator='over'/></filter></defs><polygon points='100,5 177,50 177,150 100,195 23,150 23,50' fill='#010810' stroke='#081820' stroke-width='1'/><polygon points='100,11 171,52 171,148 100,189 29,148 29,52' fill='url(#pgrd)' stroke='#0b4a60' stroke-width='1.5'/><polygon points='100,11 171,52 157,63 100,31 43,63 29,52' fill='#0a2535' stroke='#1ae0ff' stroke-width='0.7' opacity='0.9'/><polygon points='171,52 171,95 156,90 157,63' fill='#061e2c' stroke='#0da8cc' stroke-width='0.7' opacity='0.8'/><polygon points='171,95 171,148 157,137 156,90' fill='#061e2c' stroke='#0da8cc' stroke-width='0.7' opacity='0.7'/><polygon points='100,189 29,148 43,137 100,169 157,137 171,148' fill='#0a2535' stroke='#1ae0ff' stroke-width='0.7' opacity='0.8'/><polygon points='29,148 29,95 44,90 43,137' fill='#061e2c' stroke='#0da8cc' stroke-width='0.7' opacity='0.7'/><polygon points='29,52 29,95 44,90 43,63' fill='#061e2c' stroke='#0da8cc' stroke-width='0.7' opacity='0.8'/><circle cx='100' cy='13' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='171' cy='52' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='171' cy='148' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='100' cy='187' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='29' cy='148' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='29' cy='52' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><polygon points='100,30 157,63 157,137 100,170 43,137 43,63' fill='#050e18' stroke='#0b607a' stroke-width='1.2'/><circle cx='100' cy='100' r='58' fill='none' stroke='#0c5f7a' stroke-width='4'/><circle cx='100' cy='100' r='58' fill='none' stroke='#1ae0ff' stroke-width='0.8' opacity='0.5'/><g stroke='#1ae0ff' stroke-width='2' opacity='0.75'><line x1='100' y1='42' x2='100' y2='51'/><line x1='129' y1='50' x2='124.5' y2='58'/><line x1='150' y1='71' x2='143.5' y2='74.8'/><line x1='158' y1='100' x2='149' y2='100'/><line x1='150' y1='129' x2='143.5' y2='125.2'/><line x1='129' y1='150' x2='124.5' y2='142'/><line x1='100' y1='158' x2='100' y2='149'/><line x1='71' y1='150' x2='75.5' y2='142'/><line x1='50' y1='129' x2='56.5' y2='125.2'/><line x1='42' y1='100' x2='51' y2='100'/><line x1='50' y1='71' x2='56.5' y2='74.8'/><line x1='71' y1='50' x2='75.5' y2='58'/></g><circle cx='100' cy='100' r='48' fill='none' stroke='#094f63' stroke-width='5.5'/><circle cx='100' cy='100' r='48' fill='none' stroke='#1ae0ff' stroke-width='1.8' stroke-dasharray='24 6' opacity='0.9'/><circle cx='100' cy='100' r='38' fill='none' stroke='#07303f' stroke-width='6.5'/><circle cx='100' cy='100' r='38' fill='none' stroke='#00d4ff' stroke-width='1.5' opacity='0.7'/><g fill='#0a2e3e' stroke='#1ae0ff' stroke-width='0.9'><rect x='96.5' y='62' width='7' height='13' rx='1'/><rect x='96.5' y='125' width='7' height='13' rx='1'/><rect x='116' y='71' width='7' height='13' rx='1' transform='rotate(60 119.5 77.5)'/><rect x='116' y='116' width='7' height='13' rx='1' transform='rotate(120 119.5 122.5)'/><rect x='77' y='116' width='7' height='13' rx='1' transform='rotate(240 80.5 122.5)'/><rect x='77' y='71' width='7' height='13' rx='1' transform='rotate(300 80.5 77.5)'/></g><polygon points='100,67 128,115 72,115' fill='#030e18' stroke='#00c8ef' stroke-width='2.5'/><line x1='100' y1='67' x2='128' y2='115' stroke='#1ae0ff' stroke-width='3.5' stroke-linecap='round'/><line x1='128' y1='115' x2='72' y2='115' stroke='#1ae0ff' stroke-width='3.5' stroke-linecap='round'/><line x1='72' y1='115' x2='100' y2='67' stroke='#1ae0ff' stroke-width='3.5' stroke-linecap='round'/><polygon points='100,73 123,112 77,112' fill='none' stroke='#008aaa' stroke-width='1'/><polygon points='100,77 119,110 81,110' fill='#001522' opacity='0.9'/><polygon points='100,77 119,110 81,110' fill='url(#coreGlow)' opacity='0.9' filter='url(#iglow)'/><circle cx='100' cy='97' r='10' fill='#00deff' opacity='0.85' filter='url(#glow)'/><circle cx='100' cy='97' r='6' fill='#88ffff' opacity='1'/><circle cx='100' cy='97' r='3' fill='white'/></svg>
+  </div>
+  <div class="intro-title">BALA<span>MURALI</span> R</div>
+  <div class="intro-bar">
+    <div class="intro-bar-label"><span>INITIALIZING SYSTEMS</span><span id="intro-pct">0%</span></div>
+    <div class="intro-bar-track"><div class="intro-bar-fill" id="intro-fill"></div></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' width='22' height='22' class="nav-brand-reactor"><defs><radialGradient id='ncg' cx='50%' cy='50%' r='50%'><stop offset='0%' stop-color='#aff7ff'/><stop offset='100%' stop-color='#006688' stop-opacity='0.2'/></radialGradient></defs><polygon points='100,9 173,51 173,149 100,191 27,149 27,51' fill='#020c14' stroke='#0b4a60' stroke-width='2'/><circle cx='100' cy='100' r='58' fill='none' stroke='#1ae0ff' stroke-width='3'/><circle cx='100' cy='100' r='45' fill='none' stroke='#00d4ff' stroke-width='5' stroke-dasharray='22 7'/><circle cx='100' cy='100' r='36' fill='none' stroke='#00d4ff' stroke-width='3'/><polygon points='100,67 128,115 72,115' fill='#030e18' stroke='#1ae0ff' stroke-width='3.5'/><polygon points='100,77 119,110 81,110' fill='url(#ncg)'/><circle cx='100' cy='97' r='10' fill='#00e8ff' opacity='0.9'/><circle cx='100' cy='97' r='5' fill='white'/></svg>
+    BALA<span> | </span>MURALI
+  </div>
+  <ul class="nav-links">
+    <li><a href="#about">Systems</a></li>
+    <li><a href="#experience">Archive</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#skills">Arsenal</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Engage ›</a>
+  <div class="nav-hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="nav-drawer" id="nav-drawer">
+  <a href="#about" onclick="closeMenu()">// Systems</a>
+  <a href="#experience" onclick="closeMenu()">// Archive</a>
+  <a href="#projects" onclick="closeMenu()">// Projects</a>
+  <a href="#skills" onclick="closeMenu()">// Arsenal</a>
+  <a href="#contact" onclick="closeMenu()">// Engage</a>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">Java 17</span><span class="ticker-item">Spring Boot</span><span class="ticker-item">Microservices</span><span class="ticker-item">Apache Kafka</span><span class="ticker-item">Redis</span><span class="ticker-item">AWS CloudWatch</span><span class="ticker-item">Docker</span><span class="ticker-item">Jenkins CI/CD</span><span class="ticker-item">3.3+ Years</span><span class="ticker-item">84% Query Boost</span><span class="ticker-item">500K+ Daily Records</span><span class="ticker-item">Maven Central</span>
+    <span class="ticker-item">Java 17</span><span class="ticker-item">Spring Boot</span><span class="ticker-item">Microservices</span><span class="ticker-item">Apache Kafka</span><span class="ticker-item">Redis</span><span class="ticker-item">AWS CloudWatch</span><span class="ticker-item">Docker</span><span class="ticker-item">Jenkins CI/CD</span><span class="ticker-item">3.3+ Years</span><span class="ticker-item">84% Query Boost</span><span class="ticker-item">500K+ Daily Records</span><span class="ticker-item">Maven Central</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="scan-line"></div>
+  <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+  <div class="hud-top-left">
+    <div class="hud-tiny">// IDENTITY LINK</div>
+    <div class="hud-tiny">BANGALORE, INDIA</div>
+    <div class="hud-tiny">BACKEND ENGINEER</div>
+  </div>
+  <div class="hud-top-right">
+    <div class="hud-tiny">ARC_REACTOR: 98.6%</div>
+    <div class="hud-tiny">SYS_STATUS: ONLINE</div>
+    <div class="hud-tiny">UPTIME: 3.3+ YRS</div>
+  </div>
+  <div class="hero-reactor-wrap">
+    <div class="hero-reactor-img-wrap">
+      <div class="hr-ring"></div><div class="hr-ring"></div><div class="hr-ring"></div>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><defs><radialGradient id='coreGlow2' cx='50%' cy='50%' r='50%'><stop offset='0%' stop-color='#aff7ff' stop-opacity='1'/><stop offset='35%' stop-color='#00d4ff' stop-opacity='0.9'/><stop offset='100%' stop-color='#004455' stop-opacity='0.2'/></radialGradient><radialGradient id='pgrd2' cx='50%' cy='50%' r='50%'><stop offset='0%' stop-color='#0a3a4a'/><stop offset='100%' stop-color='#020c14'/></radialGradient><filter id='glow2'><feGaussianBlur stdDeviation='3.5' result='b'/><feComposite in='SourceGraphic' in2='b' operator='over'/></filter><filter id='iglow2'><feGaussianBlur stdDeviation='6' result='b'/><feComposite in='SourceGraphic' in2='b' operator='over'/></filter></defs><polygon points='100,5 177,50 177,150 100,195 23,150 23,50' fill='#010810' stroke='#081820' stroke-width='1'/><polygon points='100,11 171,52 171,148 100,189 29,148 29,52' fill='url(#pgrd2)' stroke='#0b4a60' stroke-width='1.5'/><polygon points='100,11 171,52 157,63 100,31 43,63 29,52' fill='#0a2535' stroke='#1ae0ff' stroke-width='0.7' opacity='0.9'/><polygon points='171,52 171,95 156,90 157,63' fill='#061e2c' stroke='#0da8cc' stroke-width='0.7' opacity='0.8'/><polygon points='171,95 171,148 157,137 156,90' fill='#061e2c' stroke='#0da8cc' stroke-width='0.7' opacity='0.7'/><polygon points='100,189 29,148 43,137 100,169 157,137 171,148' fill='#0a2535' stroke='#1ae0ff' stroke-width='0.7' opacity='0.8'/><polygon points='29,148 29,95 44,90 43,137' fill='#061e2c' stroke='#0da8cc' stroke-width='0.7' opacity='0.7'/><polygon points='29,52 29,95 44,90 43,63' fill='#061e2c' stroke='#0da8cc' stroke-width='0.7' opacity='0.8'/><circle cx='100' cy='13' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='171' cy='52' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='171' cy='148' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='100' cy='187' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='29' cy='148' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><circle cx='29' cy='52' r='4.5' fill='#041820' stroke='#1ae0ff' stroke-width='1.2'/><polygon points='100,30 157,63 157,137 100,170 43,137 43,63' fill='#050e18' stroke='#0b607a' stroke-width='1.2'/><circle cx='100' cy='100' r='58' fill='none' stroke='#0c5f7a' stroke-width='4'/><circle cx='100' cy='100' r='58' fill='none' stroke='#1ae0ff' stroke-width='0.8' opacity='0.5'/><g stroke='#1ae0ff' stroke-width='2' opacity='0.75'><line x1='100' y1='42' x2='100' y2='51'/><line x1='129' y1='50' x2='124.5' y2='58'/><line x1='150' y1='71' x2='143.5' y2='74.8'/><line x1='158' y1='100' x2='149' y2='100'/><line x1='150' y1='129' x2='143.5' y2='125.2'/><line x1='129' y1='150' x2='124.5' y2='142'/><line x1='100' y1='158' x2='100' y2='149'/><line x1='71' y1='150' x2='75.5' y2='142'/><line x1='50' y1='129' x2='56.5' y2='125.2'/><line x1='42' y1='100' x2='51' y2='100'/><line x1='50' y1='71' x2='56.5' y2='74.8'/><line x1='71' y1='50' x2='75.5' y2='58'/></g><circle cx='100' cy='100' r='48' fill='none' stroke='#094f63' stroke-width='5.5'/><circle cx='100' cy='100' r='48' fill='none' stroke='#1ae0ff' stroke-width='1.8' stroke-dasharray='24 6' opacity='0.9'/><circle cx='100' cy='100' r='38' fill='none' stroke='#07303f' stroke-width='6.5'/><circle cx='100' cy='100' r='38' fill='none' stroke='#00d4ff' stroke-width='1.5' opacity='0.7'/><g fill='#0a2e3e' stroke='#1ae0ff' stroke-width='0.9'><rect x='96.5' y='62' width='7' height='13' rx='1'/><rect x='96.5' y='125' width='7' height='13' rx='1'/><rect x='116' y='71' width='7' height='13' rx='1' transform='rotate(60 119.5 77.5)'/><rect x='116' y='116' width='7' height='13' rx='1' transform='rotate(120 119.5 122.5)'/><rect x='77' y='116' width='7' height='13' rx='1' transform='rotate(240 80.5 122.5)'/><rect x='77' y='71' width='7' height='13' rx='1' transform='rotate(300 80.5 77.5)'/></g><polygon points='100,67 128,115 72,115' fill='#030e18' stroke='#00c8ef' stroke-width='2.5'/><line x1='100' y1='67' x2='128' y2='115' stroke='#1ae0ff' stroke-width='3.5' stroke-linecap='round'/><line x1='128' y1='115' x2='72' y2='115' stroke='#1ae0ff' stroke-width='3.5' stroke-linecap='round'/><line x1='72' y1='115' x2='100' y2='67' stroke='#1ae0ff' stroke-width='3.5' stroke-linecap='round'/><polygon points='100,73 123,112 77,112' fill='none' stroke='#008aaa' stroke-width='1'/><polygon points='100,77 119,110 81,110' fill='#001522' opacity='0.9'/><polygon points='100,77 119,110 81,110' fill='url(#coreGlow2)' opacity='0.9' filter='url(#iglow2)'/><circle cx='100' cy='97' r='10' fill='#00deff' opacity='0.85' filter='url(#glow2)'/><circle cx='100' cy='97' r='6' fill='#88ffff' opacity='1'/><circle cx='100' cy='97' r='3' fill='white'/></svg>
+    </div>
+    <div class="reactor-readout">
+      <div class="reactor-readout-label">ARC REACTOR · ENERGY OUTPUT</div>
+      <div class="reactor-bar-wrap"><div class="reactor-bar-fill"></div></div>
+    </div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-label">PORTFOLIO v2026 // BACKEND ENGINEER</div>
+    <h1 class="hero-title">I am<span class="name-hl">Balamurali. R</span></h1>
+    <div class="hero-subtitle">Java · Spring Boot · Microservices · AWS</div>
+    <p class="hero-desc">Backend engineer architecting scalable, production-grade systems with 3.3+ years of battle-tested experience. Turning complex distributed problems into clean, high-performance solutions.</p>
+    <div class="hero-actions">
+      <a href="#experience" class="btn-primary">View Work</a>
+      <a href="#contact" class="btn-secondary">Initiate Contact</a>
+    </div>
+  </div>
+  <div class="hud-bottom">
+    <div class="hud-data">SYS.REF // 12.9482, 77.6281 · BLR-IND</div>
+    <div class="hud-status"><div class="status-dot"></div><span class="hud-data">SYSTEMS ACTIVE</span></div>
+    <div class="hud-data">BUILD: 2026.04 · v3.3+</div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="circuit-bg">
+    <svg class="circuit-svg" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
+      <g stroke="#00d4ff" stroke-width="1" fill="none">
+        <path d="M0,100 L200,100 L250,150 L400,150 L450,200 L800,200"/>
+        <path d="M0,300 L100,300 L150,250 L350,250 L400,300 L600,300 L650,350 L900,350"/>
+        <path d="M200,600 L200,400 L300,300 L500,300"/>
+        <path d="M600,0 L600,150 L700,250 L700,400 L800,500 L800,600"/>
+        <path d="M900,100 L1000,100 L1050,150 L1200,150"/>
+        <path d="M1000,0 L1000,80 L1100,80 L1150,130 L1200,130"/>
+        <circle cx="200" cy="100" r="4" fill="#00d4ff"/>
+        <circle cx="400" cy="150" r="4" fill="#00d4ff"/>
+        <circle cx="600" cy="300" r="4" fill="#00d4ff"/>
+        <circle cx="700" cy="250" r="4" fill="#00d4ff"/>
+        <circle cx="350" cy="250" r="4" fill="#00d4ff"/>
+      </g>
+    </svg>
+  </div>
+  <div class="floating-orbs" id="about-orbs"></div>
+  <div class="inner" style="position:relative;z-index:1;">
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <div class="section-hud-label">// SYSTEM PROFILE</div>
+        <h2 class="section-title">Engineer.<br/><span class="accent">Architect.</span></h2>
+        <p>Backend engineer with 3.3+ years of experience building scalable, production-grade applications using Java and Spring Boot. Specialized in microservices architecture, REST API design, and database optimization with JPA/Hibernate.</p>
+        <p>Experienced in developing cloud-ready systems on AWS and OpenShift with CI/CD pipelines using Jenkins and Docker. Proven track record of improving performance, reducing response latency, and designing modular, maintainable systems.</p>
+        <p>Published open-source Spring Boot libraries on Maven Central. Building developer-first tools that eliminate boilerplate and accelerate teams.</p>
+        <div class="about-reactor-widget">
+          <div class="arw-header">⚡ REACTOR SKILL MATRIX</div>
+          <div class="arw-row"><span class="arw-label">Java / Spring</span><div class="arw-bar"><div class="arw-fill" style="width:0" data-w="96%"></div></div><span class="arw-pct">96%</span></div>
+          <div class="arw-row"><span class="arw-label">Microservices</span><div class="arw-bar"><div class="arw-fill" style="width:0" data-w="92%"></div></div><span class="arw-pct">92%</span></div>
+          <div class="arw-row"><span class="arw-label">AWS / Cloud</span><div class="arw-bar"><div class="arw-fill" style="width:0" data-w="84%"></div></div><span class="arw-pct">84%</span></div>
+          <div class="arw-row"><span class="arw-label">Kafka / Redis</span><div class="arw-bar"><div class="arw-fill" style="width:0" data-w="88%"></div></div><span class="arw-pct">88%</span></div>
+          <div class="arw-row"><span class="arw-label">System Design</span><div class="arw-bar"><div class="arw-fill" style="width:0" data-w="90%"></div></div><span class="arw-pct">90%</span></div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-number" data-target="3.3" data-suffix="+">0</div><div class="stat-label">Years Experience</div></div>
+        <div class="stat-card"><div class="stat-number" data-target="84" data-suffix="%">0</div><div class="stat-label">Query Speedup</div></div>
+        <div class="stat-card"><div class="stat-number" data-target="500" data-suffix="K+">0</div><div class="stat-label">Daily Records</div></div>
+        <div class="stat-card"><div class="stat-number" data-target="2" data-suffix="">0</div><div class="stat-label">Maven Libraries</div></div>
+        <div class="stat-card"><div class="stat-number" data-target="99.9" data-suffix="%">0</div><div class="stat-label">Accuracy Rate</div></div>
+        <div class="stat-card"><div class="stat-number" data-target="10" data-suffix="K+">0</div><div class="stat-label">Concurrent Users</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="hex-bg" id="hex-bg"></div>
+  <div class="inner" style="position:relative;z-index:1;">
+    <div class="reveal">
+      <div class="section-hud-label">// MISSION ARCHIVE</div>
+      <h2 class="section-title">Work <span class="accent">Experience</span></h2>
+    </div>
+    <div class="exp-item reveal">
+      <div class="exp-meta">
+        <div class="exp-company">DEXTRIS Infoservices</div>
+        <div class="exp-date">Jun 2024 – Present</div>
+        <div class="exp-date">Bangalore, India</div>
+      </div>
+      <div class="exp-content">
+        <div class="exp-role">Software Engineer</div>
+        <div class="exp-project">▸ LexFlow – Legal Case Lifecycle Platform</div>
+        <ul class="exp-bullets">
+          <li>Designed multi-stage approval workflows for <span class="hi">50K+ cases</span> with RBAC using Spring Security + JWT</li>
+          <li>Integrated data from <span class="hi">Multiple independent repositories</span> into unified operational & audit reports</li>
+          <li>Implemented production monitoring with AWS CloudWatch; handled debugging and performance tuning</li>
+          <li>Optimized case retrieval queries: <span class="hi">2.5s → 400ms (84% improvement)</span> using indexed aggregation with Redis caching</li>
+          <li>Built dynamic report generation & Excel export handling <span class="hi">100K+ records with 93% time reduction</span> (45s → 3s)</li>
+        </ul>
+        <div class="exp-project" style="margin-top:20px;">▸ PIT – Personal Information Tracker</div>
+        <ul class="exp-bullets">
+          <li>Designed & developed RESTful APIs for bulk employee onboarding (<span class="hi">1000+ records at once</span>)</li>
+          <li>Implemented multi-stage approval workflows ensuring zero data loss across <span class="hi">5K+ employee records</span></li>
+          <li>Automated <span class="hi">6-month retention policy</span> using Spring Batch; built duplicate validation with multiple identifiers</li>
+        </ul>
+        <div class="exp-project" style="margin-top:20px;">▸ LISA – Middleware Integration Platform (Capgemini – Volvo)</div>
+        <ul class="exp-bullets">
+          <li>Processed <span class="hi">500K+ vehicle records daily</span> with 99.9% accuracy using optimized Spring Batch pipeline</li>
+          <li>Reduced vehicle data migration time with parallel processing</li>
+          <li>Integrated Kafka event streaming for real-time data exchange; deployed on OpenShift with Docker</li>
+        </ul>
+        <div class="tech-tags">
+          <span class="tech-tag">Java 17</span><span class="tech-tag">Spring Boot</span><span class="tech-tag">Microservices</span>
+          <span class="tech-tag">Kafka</span><span class="tech-tag">Redis</span><span class="tech-tag">MySQL</span>
+          <span class="tech-tag">Spring Batch</span><span class="tech-tag">Spring Security</span><span class="tech-tag">JWT</span>
+          <span class="tech-tag">Jenkins</span><span class="tech-tag">Docker</span><span class="tech-tag">AWS</span><span class="tech-tag">OpenShift</span>
+        </div>
+      </div>
+    </div>
+    <div class="exp-item reveal">
+      <div class="exp-meta">
+        <div class="exp-company">Dheeyantra Research Labs</div>
+        <div class="exp-date">Aug 2022 – Jun 2023</div>
+        <div class="exp-date">Bangalore, India</div>
+      </div>
+      <div class="exp-content">
+        <div class="exp-role">Software Engineer</div>
+        <div class="exp-project">▸ MIMO – Money In Money Out</div>
+        <ul class="exp-bullets">
+          <li>Developed microservices for financial data ingestion & transformation from <span class="hi">5+ upstream sources</span></li>
+          <li>Optimized backend data pipeline; integrated Kafka for event-driven architecture</li>
+          <li>Built React UI for financial dashboard visualization</li>
+        </ul>
+        <div class="tech-tags">
+          <span class="tech-tag">Java</span><span class="tech-tag">Spring Boot</span><span class="tech-tag">Kafka</span>
+          <span class="tech-tag">MongoDB</span><span class="tech-tag">Oracle</span><span class="tech-tag">React</span>
+          <span class="tech-tag">Docker</span><span class="tech-tag">Jenkins</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="data-nodes" id="proj-nodes"></div>
+  <div class="inner" style="position:relative;z-index:1;">
+    <div class="reveal">
+      <div class="section-hud-label">// OPEN SOURCE ARSENAL</div>
+      <h2 class="section-title">Personal <span class="accent">Projects</span></h2>
+    </div>
+    <div class="projects-grid">
+      <div class="project-card reveal">
+        <div class="project-badge">Maven Central Published</div>
+        <div class="project-name">aws-dynamodb-auto-table</div>
+        <div class="project-tagline">Spring Boot Auto-Configuration Library · v1.0.0</div>
+        <p class="project-desc">Automatic DynamoDB table creation for Spring Boot using AWS Enhanced Client annotations. Your entity is the single source of truth — no manual table creation, no duplicate schema definitions, zero drift between environments.</p>
+        <ul class="project-features">
+          <li>Auto-creates DynamoDB tables at startup by reading schema from AWS annotations</li>
+          <li>Supports Partition Key, Sort Key, and Global Secondary Indexes (GSI)</li>
+          <li>Works with DynamoDB Local, AWS DynamoDB, and IAM Roles (EC2/ECS/EKS)</li>
+          <li>Zero credential handling, zero schema mutation, no destructive operations</li>
+          <li>Spring Boot AutoConfiguration — no application.yml config required</li>
+        </ul>
+        <div class="tech-tags" style="margin-bottom:18px;">
+          <span class="tech-tag">Java 17+</span><span class="tech-tag">Spring Boot 3.x</span>
+          <span class="tech-tag">AWS DynamoDB</span><span class="tech-tag">AWS SDK v2</span>
+        </div>
+        <div class="project-links">
+          <a href="https://central.sonatype.com/artifact/io.github.balamurali03/aws-dynamodb-auto-table" target="_blank" class="project-link primary">Maven Central</a>
+          <a href="https://github.com/Balamurali03" target="_blank" class="project-link secondary">GitHub</a>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-badge">Maven Central Published</div>
+        <div class="project-name">AuthSentinel</div>
+        <div class="project-tagline">Plug-and-Play Security Framework · v1.0.0</div>
+        <p class="project-desc">Annotation-driven security framework for Spring Boot 3.x that eliminates boilerplate. Drop in the starter, configure JWT, annotate your controllers — done. No SecurityFilterChain, no repeated JWT handling.</p>
+        <ul class="project-features">
+          <li>Annotations: <code style="color:var(--cyan);font-size:11px;">@PublicEndpoint</code>, <code style="color:var(--cyan);font-size:11px;">@SecuredEndpoint</code>, <code style="color:var(--cyan);font-size:11px;">@RoleAllowed</code></li>
+          <li>Multiple auth strategies: JWT (HS256/384/512), API Gateway Trust Mode, X.509 mTLS</li>
+          <li>Strategy Pattern Architecture — fully extensible and pluggable</li>
+          <li>BCrypt password encoding, structured 401/403 JSON responses</li>
+          <li>CI/CD via GitHub Actions with GPG signing and Maven Central auto-publish</li>
+        </ul>
+        <div class="tech-tags" style="margin-bottom:18px;">
+          <span class="tech-tag">Java 21</span><span class="tech-tag">Spring Boot 3.2</span>
+          <span class="tech-tag">Spring Security</span><span class="tech-tag">JWT</span><span class="tech-tag">AOP</span>
+        </div>
+        <div class="project-links">
+          <a href="https://central.sonatype.com/artifact/io.github.balamurali03/auth-sentinel-starter" target="_blank" class="project-link primary">Maven Central</a>
+          <a href="https://github.com/Balamurali03/auth-sentinel" target="_blank" class="project-link secondary">GitHub</a>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-badge">Personal Project</div>
+        <div class="project-name">Reactive Two-Wheeler Platform</div>
+        <div class="project-tagline">Microservices Architecture · Spring WebFlux</div>
+        <p class="project-desc">Multi-service microservices architecture with Auth, User, and Vehicle services, Kong API Gateway for routing, and reactive processing using Spring WebFlux.</p>
+        <ul class="project-features">
+          <li>Multi-service architecture: Auth, User, Vehicle services</li>
+          <li>Kong API Gateway for 10K+ concurrent user handling</li>
+          <li>Spring WebFlux for reactive, non-blocking processing</li>
+          <li>Docker Compose deployment, Jenkinsfile CI/CD pipeline</li>
+        </ul>
+        <div class="tech-tags" style="margin-bottom:18px;">
+          <span class="tech-tag">Spring WebFlux</span><span class="tech-tag">Kong Gateway</span>
+          <span class="tech-tag">Docker Compose</span><span class="tech-tag">Jenkins</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Balamurali03/reactive-two-wheeler-platform" target="_blank" class="project-link secondary">View on GitHub</a>
+        </div>
+      </div>
+      <div class="project-card reveal">
+        <div class="project-badge">Personal Project</div>
+        <div class="project-name">Comprehensive Task Manager</div>
+        <div class="project-tagline">Full Stack Web Application · Spring Boot & React</div>
+        <p class="project-desc">A role-based task management web application with JWT authentication, enabling Admins, Employers, and Employees to manage users, assign work, and track task progress through a responsive React dashboard.</p>
+        <ul class="project-features">
+          <li>Role-based access control with three roles: Admin, Employer, and Employee</li>
+          <li>JWT authentication with BCrypt password encoding and stateless session management</li>
+          <li>Employers can create, assign, update, and delete tasks with deadline tracking</li>
+          <li>Employees can view assigned work and submit comments and status updates</li>
+        </ul>
+        <div class="tech-tags" style="margin-bottom:18px;">
+          <span class="tech-tag">Spring Boot</span><span class="tech-tag">Spring Security</span>
+          <span class="tech-tag">JWT</span><span class="tech-tag">React</span>
+          <span class="tech-tag">MySQL</span><span class="tech-tag">Material UI</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/Balamurali03/ComprehensiveTaskManagerWebApplication" target="_blank" class="project-link secondary">View on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="skills-grid-bg"></div>
+  <div class="inner" style="position:relative;z-index:1;">
+    <div class="reveal">
+      <div class="section-hud-label">// TECH ARSENAL</div>
+      <h2 class="section-title">Skills &amp; <span class="accent">Stack</span></h2>
+    </div>
+    <div class="skills-grid reveal">
+      <div class="skill-category">
+        <div class="skill-category-title">▸ Languages</div>
+        <div class="skill-items">
+          <span class="skill-item">Java 8</span><span class="skill-item">Java 17</span>
+          <span class="skill-item">Java 21</span><span class="skill-item">SQL</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-category-title">▸ Backend &amp; Frameworks</div>
+        <div class="skill-items">
+          <span class="skill-item">Spring Boot</span><span class="skill-item">Spring Cloud</span>
+          <span class="skill-item">Spring Security</span><span class="skill-item">Spring Batch</span>
+          <span class="skill-item">Spring WebFlux</span><span class="skill-item">Microservices</span>
+          <span class="skill-item">Eureka</span><span class="skill-item">REST APIs</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-category-title">▸ Databases &amp; Caching</div>
+        <div class="skill-items">
+          <span class="skill-item">MySQL</span><span class="skill-item">PostgreSQL</span>
+          <span class="skill-item">DynamoDB</span><span class="skill-item">MongoDB</span>
+          <span class="skill-item">Oracle</span><span class="skill-item">Redis</span>
+          <span class="skill-item">JPA / Hibernate</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-category-title">▸ Messaging &amp; Streaming</div>
+        <div class="skill-items">
+          <span class="skill-item">Apache Kafka</span><span class="skill-item">Kong Gateway</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-category-title">▸ Cloud &amp; DevOps</div>
+        <div class="skill-items">
+          <span class="skill-item">AWS EC2</span><span class="skill-item">AWS RDS</span>
+          <span class="skill-item">AWS DynamoDB</span><span class="skill-item">CloudWatch</span>
+          <span class="skill-item">OpenShift</span><span class="skill-item">Docker</span>
+          <span class="skill-item">Jenkins</span><span class="skill-item">Git</span><span class="skill-item">Maven</span>
+        </div>
+      </div>
+      <div class="skill-category">
+        <div class="skill-category-title">▸ Core Competencies</div>
+        <div class="skill-items">
+          <span class="skill-item">System Design</span><span class="skill-item">DB Optimization</span>
+          <span class="skill-item">Query Tuning</span><span class="skill-item">Distributed Systems</span>
+          <span class="skill-item">Production Debug</span><span class="skill-item">DSA</span>
+          <span class="skill-item">OOP</span><span class="skill-item">Clean Architecture</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ACHIEVEMENTS -->
+<section id="achievements">
+  <div class="data-nodes" id="ach-nodes"></div>
+  <div class="inner" style="position:relative;z-index:1;">
+    <div class="reveal">
+      <div class="section-hud-label">// KEY METRICS</div>
+      <h2 class="section-title">Key <span class="accent">Achievements</span></h2>
+    </div>
+    <div class="achievements-grid reveal">
+      <div class="achievement-item"><div class="achievement-icon">⚡</div><div class="achievement-text"><strong>84% Query Speedup</strong>Optimized critical queries from 2.5s → 400ms using indexed aggregation strategies</div></div>
+      <div class="achievement-item"><div class="achievement-icon">📊</div><div class="achievement-text"><strong>93% Report Speedup</strong>Reduced report generation from 45s → 3s handling 100K+ case records</div></div>
+      <div class="achievement-item"><div class="achievement-icon">📦</div><div class="achievement-text"><strong>Maven Central Publisher</strong>Published 'aws-dynamodb-auto-table' on Maven Central (v1.0.0)</div></div>
+      <div class="achievement-item"><div class="achievement-icon">🚀</div><div class="achievement-text"><strong>500K+ Records Daily</strong>Processed with 99.9% accuracy and 75% time reduction (8h → 2h) via Spring Batch</div></div>
+      <div class="achievement-item"><div class="achievement-icon">🏗️</div><div class="achievement-text"><strong>10K+ Concurrent Users</strong>Multi-service platform with Kong API Gateway handling 10K+ concurrent users</div></div>
+      <div class="achievement-item"><div class="achievement-icon">🛡️</div><div class="achievement-text"><strong>AuthSentinel Framework</strong>Plug-and-play annotation-driven security framework on Maven Central</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-rings">
+    <div class="c-ring" style="animation-delay:0s;"></div>
+    <div class="c-ring" style="animation-delay:2s;"></div>
+    <div class="c-ring" style="animation-delay:4s;"></div>
+  </div>
+  <div class="reveal">
+    <div class="section-hud-label" style="text-align:center;">// INITIATE CONTACT</div>
+    <h2 class="contact-title">Let's <span style="color:var(--cyan);">Build</span></h2>
+    <p class="contact-subtitle">Available for backend engineering roles · Bangalore, India</p>
+    <div class="contact-links">
+      <a href="mailto:balamurali03101997@gmail.com" class="contact-link">✉ Email</a>
+      <a href="https://www.linkedin.com/in/balamurali-r-a56b55168/" target="_blank" class="contact-link">⬡ LinkedIn</a>
+      <a href="https://github.com/Balamurali03" target="_blank" class="contact-link">◈ GitHub</a>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <div class="footer-brand">BALAMURALI R</div>
+    <div class="footer-copy">© 2026 · JAVA BACKEND ENGINEER · BLR, IND</div>
+    <div class="footer-copy">BUILD: v2026.04</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     JARVIS VOICE ASSISTANT
+══════════════════════════════════════════ -->
+<div id="jarvis-btn" onclick="toggleJarvis()" title="JARVIS Voice Assistant">
+  <div class="jarvis-icon">
+    <div class="jarvis-icon-ring"></div>
+    <div class="jarvis-icon-core"></div>
+  </div>
+</div>
+
+<div id="jarvis-panel">
+  <div class="jp-header">
+    <div class="jp-title">⬡ J.A.R.V.I.S</div>
+    <div class="jp-status"><div class="status-dot"></div><span id="jp-status-text">STANDBY</span></div>
+    <div class="jp-close" onclick="closeJarvis()">✕</div>
+  </div>
+  <div class="jp-wave" id="jp-wave">
+    <!-- bars injected by JS -->
+  </div>
+  <div class="jp-log" id="jp-log">
+    <div class="jp-msg jarvis">Hello. I am J.A.R.V.I.S — your guide to Balamurali's systems. Say a command or tap a suggestion below.</div>
+  </div>
+  <div class="jp-suggestions">
+    <div class="jp-chip" onclick="handleCommand('who are you')">Who is Bala?</div>
+    <div class="jp-chip" onclick="handleCommand('show experience')">Experience</div>
+    <div class="jp-chip" onclick="handleCommand('show projects')">Projects</div>
+    <div class="jp-chip" onclick="handleCommand('show skills')">Skills</div>
+    <div class="jp-chip" onclick="handleCommand('show achievements')">Achievements</div>
+    <div class="jp-chip" onclick="handleCommand('contact')">Contact</div>
+    <div class="jp-chip stop-chip" onclick="handleCommand('stop')" style="border-color:rgba(255,51,102,0.4);color:rgba(255,51,102,0.7);">⏹ Stop</div>
+  </div>
+  <div class="jp-controls">
+    <div class="jp-mic-btn" id="jp-mic" onclick="toggleVoice()">🎤</div>
+    <div style="flex:1;">
+      <div class="jp-hint" id="jp-hint">Tap mic to speak · or use chips above</div>
+      <select id="jp-voice-select" style="
+        margin-top:5px;width:100%;background:#000;color:rgba(0,212,255,0.7);
+        border:1px solid rgba(0,212,255,0.2);font-family:Share Tech Mono,monospace;
+        font-size:8px;letter-spacing:1px;padding:3px 6px;cursor:pointer;
+        outline:none;
+      ">
+        <option value="">— Select Voice —</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── INTRO LOADER ── */
+(function() {
+  const fill  = document.getElementById('intro-fill');
+  const pct   = document.getElementById('intro-pct');
+  const intro = document.getElementById('intro');
+  let p = 0;
+  const iv = setInterval(() => {
+    p += Math.random() * 8 + 2;
+    if (p >= 100) { p = 100; clearInterval(iv); }
+    pct.textContent = Math.floor(p) + '%';
+    if (p >= 100) {
+      setTimeout(() => {
+        intro.classList.add('hidden');
+        document.body.style.overflow = '';
+        triggerSkillBars();
+        initParticles();
+        initSectionGraphics();
+        animateStats();
+      }, 600);
+    }
+  }, 80);
+  document.body.style.overflow = 'hidden';
+})();
+
+/* ── SCROLL REVEAL ── */
+const reveals = document.querySelectorAll('.reveal');
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+reveals.forEach(r => ro.observe(r));
+
+/* ── SKILL BARS ── */
+function triggerSkillBars() {
+  const bars = document.querySelectorAll('.arw-fill');
+  const bo = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.style.width = e.target.dataset.w; bo.unobserve(e.target); }
+    });
+  }, { threshold: 0.3 });
+  bars.forEach(b => bo.observe(b));
+}
+
+/* ── MOBILE NAV ── */
+function toggleMenu() { document.getElementById('nav-drawer').classList.toggle('open'); }
+function closeMenu() { document.getElementById('nav-drawer').classList.remove('open'); }
+
+/* ── LIVE HUD CLOCK ── */
+setInterval(() => {
+  const t = new Date().toTimeString().slice(0,8);
+  document.querySelectorAll('.hud-data').forEach((el,i) => { if(i===1) el.textContent = 'T: ' + t; });
+}, 1000);
+
+/* ══════════════════════════════════
+   PARTICLES
+══════════════════════════════════ */
+function initParticles() {
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], mouse = {x:-999,y:-999};
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+  class Particle {
+    constructor() { this.reset(true); }
+    reset(init) {
+      this.x = Math.random() * W;
+      this.y = init ? Math.random() * H : H + 10;
+      this.vx = (Math.random() - 0.5) * 0.3;
+      this.vy = -(Math.random() * 0.5 + 0.1);
+      this.size = Math.random() * 1.5 + 0.5;
+      this.life = 1;
+      this.decay = Math.random() * 0.003 + 0.001;
+      this.connected = [];
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.life -= this.decay;
+      const dx = this.x - mouse.x, dy = this.y - mouse.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 80) { this.vx += dx/dist * 0.05; this.vy += dy/dist * 0.05; }
+      if (this.life <= 0 || this.y < -10) this.reset(false);
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(0,212,255,${this.life * 0.6})`;
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+  function drawConnections() {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i+1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 100) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          const alpha = (1 - d/100) * 0.15 * Math.min(particles[i].life, particles[j].life);
+          ctx.strokeStyle = `rgba(0,212,255,${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => { p.update(); p.draw(); });
+    drawConnections();
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+/* ══════════════════════════════════
+   SECTION GRAPHICS
+══════════════════════════════════ */
+function initSectionGraphics() {
+  // Floating orbs for about section
+  const aboutOrbs = document.getElementById('about-orbs');
+  for (let i = 0; i < 6; i++) {
+    const orb = document.createElement('div');
+    orb.className = 'orb';
+    const size = 60 + Math.random() * 120;
+    orb.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      animation-duration:${8+Math.random()*12}s;
+      animation-delay:${Math.random()*6}s;
+    `;
+    aboutOrbs.appendChild(orb);
+  }
+
+  // Hex grid for experience
+  const hexBg = document.getElementById('hex-bg');
+  if (hexBg) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('width','100%'); svg.setAttribute('height','100%');
+    svg.style.cssText = 'position:absolute;inset:0;opacity:0.03;';
+    const cols = 20, rows = 10;
+    const hw = 50, hh = 44;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const ox = c * hw * 1.5;
+        const oy = r * hh * 2 + (c%2 ? hh : 0);
+        const hex = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+        const pts = Array.from({length:6},(_,i) => {
+          const a = Math.PI/180 * (60*i - 30);
+          return `${ox+hw*Math.cos(a)},${oy+hh*Math.sin(a)}`;
+        }).join(' ');
+        hex.setAttribute('points', pts);
+        hex.setAttribute('fill','none');
+        hex.setAttribute('stroke','#00d4ff');
+        hex.setAttribute('stroke-width','1');
+        svg.appendChild(hex);
+      }
+    }
+    hexBg.appendChild(svg);
+  }
+
+  // Data nodes for projects
+  spawnNodes('proj-nodes', 12);
+  spawnNodes('ach-nodes', 8);
+}
+
+function spawnNodes(id, count) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  for (let i = 0; i < count; i++) {
+    const d = document.createElement('div');
+    d.className = 'node-dot';
+    d.style.cssText = `
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      animation-delay:${Math.random()*3}s;
+      animation-duration:${2+Math.random()*3}s;
+    `;
+    el.appendChild(d);
+  }
+}
+
+/* ── STAT COUNTER ANIMATION ── */
+function animateStats() {
+  const statNums = document.querySelectorAll('.stat-number[data-target]');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const target = parseFloat(el.dataset.target);
+      const suffix = el.dataset.suffix || '';
+      const duration = 1400;
+      const start = performance.now();
+      const isDecimal = String(target).includes('.');
+      function step(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const val = target * ease;
+        el.textContent = (isDecimal ? val.toFixed(1) : Math.floor(val)) + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+        else el.textContent = target + suffix;
+      }
+      requestAnimationFrame(step);
+      io.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  statNums.forEach(el => io.observe(el));
+}
+
+/* ══════════════════════════════════
+   JARVIS VOICE ASSISTANT
+══════════════════════════════════ */
+const jarvisPanel = document.getElementById('jarvis-panel');
+const jarvisBtn   = document.getElementById('jarvis-btn');
+const jpLog       = document.getElementById('jp-log');
+const jpStatusTxt = document.getElementById('jp-status-text');
+const jpMic       = document.getElementById('jp-mic');
+const jpHint      = document.getElementById('jp-hint');
+const jpWave      = document.getElementById('jp-wave');
+
+// Build waveform bars
+const BARS = 28;
+for (let i = 0; i < BARS; i++) {
+  const b = document.createElement('div');
+  b.className = 'wave-bar';
+  b.style.height = '4px';
+  jpWave.appendChild(b);
+}
+const waveBars = jpWave.querySelectorAll('.wave-bar');
+
+let waveInterval = null;
+function animateWave(active) {
+  clearInterval(waveInterval);
+  if (active) {
+    waveInterval = setInterval(() => {
+      waveBars.forEach(b => {
+        const h = active ? 4 + Math.random() * 36 : 4;
+        b.style.height = h + 'px';
+      });
+    }, 80);
+  } else {
+    waveBars.forEach(b => b.style.height = '4px');
+  }
+}
+
+let panelOpen = false;
+function toggleJarvis() { panelOpen ? closeJarvis() : openJarvis(); }
+function openJarvis() { panelOpen = true; jarvisPanel.classList.add('open'); }
+function closeJarvis() {
+  panelOpen = false; jarvisPanel.classList.remove('open');
+  stopVoice();
+}
+
+// Knowledge base
+const knowledge = {
+  about: {
+    triggers: ['who','bala','about','profile','engineer','intro','you'],
+    section: 'about',
+    response: "Balamurali R is a Backend Engineer with 3.3+ years of experience. He specializes in Java, Spring Boot, and microservices architecture. Based in Bangalore, India. He's built systems handling 500K+ daily records and published two libraries on Maven Central."
+  },
+  experience: {
+    triggers: ['experience','work','job','career','company','dextris','dheeyantra','mimo','lexflow'],
+    section: 'experience',
+    response: "Balamurali has worked at DEXTRIS Infoservices since June 2024, building the LexFlow legal platform and LISA middleware for Capgemini-Volvo. Earlier at Dheeyantra Research Labs in 2022, he built MIMO — a financial data microservices platform."
+  },
+  projects: {
+    triggers: ['project','open source','maven','dynamodb','authsentinel','library','github'],
+    section: 'projects',
+    response: "He has 4 notable projects. Two are Maven Central published: 'aws-dynamodb-auto-table' — an auto-configuration library for DynamoDB, and 'AuthSentinel' — a plug-and-play JWT security framework. Also built a Reactive Two-Wheeler Platform with Kong Gateway, and a full-stack Task Manager."
+  },
+  skills: {
+    triggers: ['skill','stack','tech','java','spring','kafka','redis','aws','docker','language'],
+    section: 'skills',
+    response: "His core stack is Java 17-21, Spring Boot ecosystem including Security, Batch, WebFlux, and Cloud. Databases include MySQL, PostgreSQL, DynamoDB, MongoDB, and Redis. Cloud and DevOps: AWS, OpenShift, Docker, Jenkins. Expert in system design, query optimization, and distributed systems."
+  },
+  achievements: {
+    triggers: ['achievement','metric','performance','speed','record','accuracy','concurrent'],
+    section: 'achievements',
+    response: "Impressive metrics: 84% query speedup — from 2.5s down to 400ms. 93% report speedup — 45 seconds down to 3. Processes 500K+ records daily at 99.9% accuracy. Published 2 Maven Central libraries. Handles 10K+ concurrent users via Kong Gateway."
+  },
+  contact: {
+    triggers: ['contact','email','linkedin','github','hire','reach','connect','message'],
+    section: 'contact',
+    response: "You can reach Balamurali at balamurali03101997@gmail.com. Also on LinkedIn and GitHub under Balamurali03. He's available for backend engineering roles in Bangalore and open to discussions."
+  }
+};
+
+function findMatch(input) {
+  const lower = input.toLowerCase();
+  for (const [key, val] of Object.entries(knowledge)) {
+    if (val.triggers.some(t => lower.includes(t))) return val;
+  }
+  return null;
+}
+
+function addMsg(text, type, animate=true) {
+  const msg = document.createElement('div');
+  msg.className = `jp-msg ${type}`;
+  if (animate && type === 'jarvis') {
+    msg.textContent = '';
+    jpLog.appendChild(msg);
+    jpLog.scrollTop = jpLog.scrollHeight;
+    let i = 0;
+    const iv = setInterval(() => {
+      msg.textContent = text.slice(0, i++);
+      jpLog.scrollTop = jpLog.scrollHeight;
+      if (i > text.length) clearInterval(iv);
+    }, 18);
+  } else {
+    msg.textContent = text;
+    jpLog.appendChild(msg);
+    jpLog.scrollTop = jpLog.scrollHeight;
+  }
+}
+
+function handleCommand(input) {
+  // ── STOP command ──
+  const stopTriggers = ['stop','halt','quiet','silence','shut up','pause','cancel','enough','mute'];
+  if (stopTriggers.some(t => input.toLowerCase().includes(t))) {
+    stopSpeaking();
+    stopVoice();
+    jpStatusTxt.textContent = 'STANDBY';
+    jarvisBtn.classList.remove('listening');
+    const stopResponses = [
+      "Standing by, sir.",
+      "Understood. Going silent.",
+      "Voice output halted. At your command.",
+      "Muted. Awaiting further instructions."
+    ];
+    const resp = stopResponses[Math.floor(Math.random() * stopResponses.length)];
+    if (!panelOpen) openJarvis();
+    addMsg(input, 'user', false);
+    addMsg(resp, 'jarvis');
+    // Brief spoken acknowledgment before going silent
+    const ack = new SpeechSynthesisUtterance("Standing by.");
+    ack.rate = 0.88; ack.pitch = 0.82; ack.volume = 1.0;
+    const v = getSelectedVoice() || getBestVoice();
+    if (v) ack.voice = v;
+    if (window.speechSynthesis) window.speechSynthesis.speak(ack);
+    return;
+  }
+
+  if (!panelOpen) openJarvis();
+  addMsg(input, 'user', false);
+  animateWave(true);
+  jarvisPanel.classList.add('speaking');
+  jpStatusTxt.textContent = 'PROCESSING';
+
+  const match = findMatch(input);
+  setTimeout(() => {
+    animateWave(false);
+    jarvisPanel.classList.remove('speaking');
+    jpStatusTxt.textContent = 'ONLINE';
+
+    if (match) {
+      addMsg(match.response, 'jarvis');
+      // Scroll to section
+      setTimeout(() => {
+        const sec = document.getElementById(match.section);
+        if (sec) {
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          sec.classList.add('section-highlight');
+          setTimeout(() => sec.classList.remove('section-highlight'), 2000);
+        }
+      }, 600);
+      // Speak response
+      speakText(match.response);
+    } else {
+      const fallbacks = [
+        "Command not recognized. Try asking about my experience, projects, skills, achievements, or contact information.",
+        "I didn't catch that. You can ask about Balamurali's work history, tech stack, open source projects, or how to reach him.",
+        "Unrecognized query. Available sections: About, Experience, Projects, Skills, Achievements, Contact."
+      ];
+      const resp = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+      addMsg(resp, 'jarvis');
+      speakText(resp);
+    }
+  }, 600);
+}
+
+/* ══════════════════════════════════════════════════════
+   HUMANISED VOICE ENGINE
+   Strategy:
+   1. ElevenLabs free tier  → "Daniel" (British male, deep, natural)
+   2. Google Cloud TTS demo → falls back if ElevenLabs unavailable
+   3. Web Speech API        → last resort, maximally tuned
+   The ElevenLabs "Daniel" voice_id is a publicly documented
+   free-tier voice that closely resembles a composed British AI assistant.
+══════════════════════════════════════════════════════ */
+
+// ── State ──
+let currentAudio  = null;   // HTMLAudioElement for ElevenLabs audio
+let speaking      = false;
+const synth       = window.speechSynthesis;
+
+// ── Voice priority list (Web Speech fallback) ──
+// Best human-sounding voices across platforms, ranked
+const VOICE_PRIORITY = [
+  // Chrome / Google voices (most natural)
+  'google uk english male',
+  'google us english',
+  'google uk english female',
+  // macOS / iOS high-quality
+  'daniel',           // macOS Daniel — British, very natural
+  'arthur',           // macOS Arthur — British
+  'rishi',            // macOS Rishi — Indian English, clear
+  'aaron',            // macOS Aaron — American, clear
+  'fred',             // macOS Fred — older but natural
+  'gordon',           // macOS Gordon
+  // Windows / Edge neural voices
+  'microsoft ryan online',
+  'microsoft guy online',
+  'microsoft george online',
+  'microsoft james online',
+  // Generic fallbacks
+  'english',
+  'en-gb',
+  'en-us',
+];
+
+let cachedVoice = null;
+function getBestVoice() {
+  if (cachedVoice) return cachedVoice;
+  const voices = synth.getVoices();
+  if (!voices.length) return null;
+  for (const keyword of VOICE_PRIORITY) {
+    const match = voices.find(v =>
+      v.name.toLowerCase().includes(keyword) ||
+      v.lang.toLowerCase().includes(keyword)
+    );
+    if (match) { cachedVoice = match; return match; }
+  }
+  // Last resort: first English voice, or first available
+  return voices.find(v => v.lang.startsWith('en')) || voices[0];
+}
+
+// Warm up voices list immediately & populate selector
+function populateVoiceSelect() {
+  const sel = document.getElementById('jp-voice-select');
+  if (!sel || !synth) return;
+  const voices = synth.getVoices();
+  if (!voices.length) return;
+  sel.innerHTML = '<option value="">— Auto (Best Available) —</option>';
+  // Show only English voices to keep list manageable
+  const english = voices.filter(v => v.lang.startsWith('en'));
+  (english.length ? english : voices).forEach((v, i) => {
+    const opt = document.createElement('option');
+    opt.value = voices.indexOf(v);
+    opt.textContent = v.name + ' (' + v.lang + ')';
+    sel.appendChild(opt);
+  });
+}
+function getSelectedVoice() {
+  const sel = document.getElementById('jp-voice-select');
+  if (!sel || sel.value === '') return null;
+  return synth.getVoices()[parseInt(sel.value)] || null;
+}
+if (synth) {
+  synth.getVoices();
+  synth.onvoiceschanged = () => { cachedVoice = null; populateVoiceSelect(); };
+  setTimeout(populateVoiceSelect, 500);
+}
+
+/* ── ElevenLabs free-tier voice IDs ──
+   These are publicly available pre-made voices on ElevenLabs
+   that do not require an API key for the streaming preview endpoint.
+   "Daniel" (pNInz6obpgDQGcFmaJgB) → deep, calm, British male
+   "George" (JBFqnCBsd6RMkjVDRZzb) → British, composed, professional  */
+const ELEVEN_VOICE_ID   = 'JBFqnCBsd6RMkjVDRZzb'; // George — closest to JARVIS
+const ELEVEN_MODEL      = 'eleven_multilingual_v2';
+
+async function speakElevenLabs(text) {
+  /* ElevenLabs text-to-speech — requires API key in production.
+     Here we attempt the public streaming preview used by their own
+     website demos. If blocked (CORS / key required), falls through. */
+  try {
+    const res = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${ELEVEN_VOICE_ID}/stream`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'xi-api-key': '' },
+      body: JSON.stringify({
+        text,
+        model_id: ELEVEN_MODEL,
+        voice_settings: { stability: 0.55, similarity_boost: 0.80, style: 0.20, use_speaker_boost: true }
+      })
+    });
+    if (!res.ok) throw new Error('elevenlabs_unavailable');
+    const blob  = await res.blob();
+    const url   = URL.createObjectURL(blob);
+    return url;
+  } catch { return null; }
+}
+
+/* ── Main speak function ── */
+async function speakText(text) {
+  // Stop any current speech
+  stopSpeaking();
+
+  speaking = true;
+  animateWave(true);
+  jarvisPanel.classList.add('speaking');
+
+  // Try ElevenLabs first
+  const audioUrl = await speakElevenLabs(text);
+  if (audioUrl) {
+    currentAudio = new Audio(audioUrl);
+    currentAudio.onended = () => {
+      speaking = false;
+      animateWave(false);
+      jarvisPanel.classList.remove('speaking');
+      URL.revokeObjectURL(audioUrl);
+    };
+    currentAudio.onerror = () => {
+      // Fall back to Web Speech if audio fails to play
+      speakWebSpeech(text);
+    };
+    try {
+      await currentAudio.play();
+      return; // Success — ElevenLabs playing
+    } catch { /* autoplay blocked, fall through */ }
+  }
+
+  // Fallback → maximally-tuned Web Speech
+  speakWebSpeech(text);
+}
+
+function speakWebSpeech(text) {
+  if (!synth) { speaking = false; animateWave(false); jarvisPanel.classList.remove('speaking'); return; }
+  synth.cancel();
+
+  /* Split into sentences for more natural pacing */
+  const sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
+
+  function speakChunk(i) {
+    if (i >= sentences.length) {
+      speaking = false;
+      animateWave(false);
+      jarvisPanel.classList.remove('speaking');
+      return;
+    }
+    const utt = new SpeechSynthesisUtterance(sentences[i].trim());
+
+    /* Voice tuning to sound as natural as possible:
+       - rate 0.88 → slightly slower than default for gravitas
+       - pitch 0.82 → lower than default (1.0) for a deeper tone
+       - volume 1.0 → full clarity */
+    utt.rate   = 0.88;
+    utt.pitch  = 0.82;
+    utt.volume = 1.0;
+
+    const voice = getSelectedVoice() || getBestVoice();
+    if (voice) utt.voice = voice;
+
+    utt.onstart = () => { speaking = true; animateWave(true); };
+    utt.onend   = () => speakChunk(i + 1);
+    utt.onerror = () => speakChunk(i + 1);
+    synth.speak(utt);
+  }
+
+  speakChunk(0);
+}
+
+function stopSpeaking() {
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  if (synth) synth.cancel();
+  speaking = false;
+  animateWave(false);
+  jarvisPanel.classList.remove('speaking');
+}
+
+// ── Voice Recognition ──
+let recognition  = null;
+let voiceActive  = false;
+
+function toggleVoice() {
+  if (speaking) { stopSpeaking(); return; }   // tap to interrupt JARVIS mid-speech
+  if (voiceActive) { stopVoice(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    addMsg("Voice recognition not supported in this browser. Please use Chrome or Edge.", 'jarvis');
+    speakText("Voice recognition is not supported in this browser. Please use Chrome or Edge for the full experience.");
+    return;
+  }
+  recognition = new SR();
+  recognition.lang              = 'en-US';
+  recognition.interimResults    = false;
+  recognition.continuous        = false;
+  recognition.maxAlternatives   = 1;
+
+  recognition.onstart = () => {
+    voiceActive = true;
+    jpMic.classList.add('active');
+    jpMic.textContent    = '⏹';
+    jpStatusTxt.textContent = 'LISTENING';
+    jarvisBtn.classList.add('listening');
+    jpHint.textContent   = 'Listening… speak now';
+    animateWave(true);
+    stopSpeaking(); // stop any current speech when user starts talking
+  };
+
+  recognition.onresult = e => {
+    const transcript = e.results[0][0].transcript.trim();
+    stopVoice();
+    handleCommand(transcript);
+  };
+
+  recognition.onnomatch = () => {
+    stopVoice();
+    addMsg("I didn't catch that. Please try again.", 'jarvis');
+    speakText("I didn't catch that. Please try again.");
+  };
+
+  recognition.onerror = e => {
+    stopVoice();
+    if (e.error === 'not-allowed') {
+      addMsg("Microphone access denied. Please allow microphone permissions and try again.", 'jarvis');
+    } else if (e.error === 'no-speech') {
+      addMsg("No speech detected. Try speaking closer to your microphone.", 'jarvis');
+    } else {
+      addMsg("Voice error: " + e.error + ". Please try again.", 'jarvis');
+    }
+  };
+
+  recognition.onend = () => stopVoice();
+  recognition.start();
+}
+
+function stopVoice() {
+  voiceActive = false;
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+  jpMic.classList.remove('active');
+  jpMic.textContent       = '🎤';
+  jpStatusTxt.textContent = 'ONLINE';
+  jarvisBtn.classList.remove('listening');
+  jpHint.textContent      = 'Tap mic to speak · or use chips above';
+  animateWave(false);
+}
+</script>
+</body>
+</html>
